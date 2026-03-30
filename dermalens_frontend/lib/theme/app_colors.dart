@@ -7,4 +7,8 @@ class AppColors {
   static const Color warmGold = Color(0xFFC4956A);
   static const Color sand = Color(0xFFD4B89A);
   static const Color blush = Color(0xFFE8D5C0);
+  static const Color severityLow = Color(0xFF4CAF50); 
+  static const Color severityMedium = warmGold;       
+  static const Color severityHigh = Color(0xFFE57373); 
+
 }

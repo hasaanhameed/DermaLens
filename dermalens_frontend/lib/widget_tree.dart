@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../notifiers/navigation_notifier.dart';
 import '../theme/app_colors.dart';
 import '../widgets/footer_widget.dart';
+import '../pages/history_page.dart';
+import '../pages/history_details_page.dart';
 
 // 1. We import your brand new HomePage!
 import '../pages/home_page.dart';
@@ -20,12 +22,7 @@ class _WidgetTreeState extends State<WidgetTree> {
   // The first is HomePage. The other two are temporary placeholders.
   final List<Widget> _pages = [
     const HomePage(),
-    const Center(
-      child: Text(
-        "History Page (Coming Soon)", 
-        style: TextStyle(color: AppColors.sand, fontFamily: 'Raleway')
-      )
-    ),
+     HistoryPage(),  
     const Center(
       child: Text(
         "Profile Page (Coming Soon)", 
