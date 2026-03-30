@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:dermalens/theme/app_colors.dart';
-import 'package:lottie/lottie.dart'; // <--- ADD THIS LINE
-
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -11,61 +9,44 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.surface, // The base dark surface
       body: SafeArea(
-        child: SingleChildScrollView( 
+        child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // 1. GREETING & PROFILE SECTION
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                    const SizedBox(height: 20),
-                      const Text(
-                        'Welcome, Hasaan!',
-                        style: TextStyle(
-                          fontFamily: 'Raleway',
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.sand,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Ready to start your skincare journey?',
-                        style: TextStyle(
-                          fontFamily: 'Raleway',
-                          fontSize: 17,
-                          color: AppColors.sand, 
-                        ),
-                      ),
-                    ],
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Welcome, Hasaan!',
+                    style: TextStyle(
+                      fontFamily: 'Raleway',
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.sand,
+                    ),
                   ),
-                                    // The Animated DermaLens Logo
-                  Lottie.asset(
-                    'lib/assets/animations/liquid_circle.json',
-                    width: 40,
-                    height: 40,
-                    fit: BoxFit.contain,
+                  const SizedBox(height: 4),
+                  const Text(
+                    'Ready to start your skincare journey?',
+                    style: TextStyle(
+                      fontFamily: 'Raleway',
+                      fontSize: 17,
+                      color: AppColors.sand,
+                    ),
                   ),
-
-                 
                 ],
-                
               ),
-              
+
               const SizedBox(height: 36),
 
-
-                            // 2. PRIMARY AI TOOL
-              
+              // 2. PRIMARY AI TOOL
               const SizedBox(height: 16),
-              
+
               // The Single "Scan Now" Button
-                            // The Single "Scan Now" Button
+              // The Single "Scan Now" Button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -75,16 +56,27 @@ class HomePage extends StatelessWidget {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.elevated,
-                    padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 32,
+                      horizontal: 24,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
-                      side: const BorderSide(color: AppColors.warmGold, width: 0.5),
+                      side: const BorderSide(
+                        color: AppColors.warmGold,
+                        width: 0.5,
+                      ),
                     ),
-                    elevation: 0, // Set to 0 so it matches your flat, sleek design
+                    elevation:
+                        0, // Set to 0 so it matches your flat, sleek design
                   ),
                   child: const Column(
                     children: [
-                      Icon(Icons.center_focus_strong, color: AppColors.warmGold, size: 56),
+                      Icon(
+                        Icons.center_focus_strong,
+                        color: AppColors.warmGold,
+                        size: 56,
+                      ),
                       SizedBox(height: 16),
                       Text(
                         'Scan Image',
@@ -109,7 +101,6 @@ class HomePage extends StatelessWidget {
                   ),
                 ),
               ),
-
 
               const SizedBox(height: 24),
 
@@ -137,12 +128,13 @@ class HomePage extends StatelessWidget {
                     Text(
                       '1. Tap the Scan Image button above.\n'
                       '2. Take or upload a clear, well-lit photo of the affected area.\n'
-                      '3. Wait while our Deep Learning model identifies the issue.\n'
+                      '3. Wait while our AI model identifies the issue.\n'
                       '4. Review your results, confidence score, and severity.',
                       style: TextStyle(
                         fontFamily: 'Raleway',
                         fontSize: 14,
-                        height: 1.6, // Adding line height to make it spaced out and readable
+                        height:
+                            1.6, // Adding line height to make it spaced out and readable
                         color: AppColors.sand,
                       ),
                     ),
@@ -152,8 +144,6 @@ class HomePage extends StatelessWidget {
 
               const SizedBox(height: 36),
 
-
-                           
               // 3. DAILY SKIN TIP
               Container(
                 width: double.infinity,
@@ -165,7 +155,11 @@ class HomePage extends StatelessWidget {
                 ),
                 child: const Row(
                   children: [
-                    Icon(Icons.lightbulb_outline, color: AppColors.warmGold, size: 32),
+                    Icon(
+                      Icons.lightbulb_outline,
+                      color: AppColors.warmGold,
+                      size: 32,
+                    ),
                     SizedBox(width: 16),
                     Expanded(
                       child: Column(
@@ -195,7 +189,7 @@ class HomePage extends StatelessWidget {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 36),
             ],
           ),

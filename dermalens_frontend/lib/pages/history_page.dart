@@ -5,16 +5,16 @@ import 'history_details_page.dart';
 class HistoryPage extends StatelessWidget {
   HistoryPage({super.key});
 
-   final List<Map<String, String>> hardcodedScans = [
+  final List<Map<String, String>> hardcodedScans = [
     {
       "date": "Oct 24, 2026",
       "condition": "Discoloured Spots",
       "severity": "Low Risk",
       "Model Prediction Accuracy": "95%",
       "imageUrl": "https://via.placeholder.com/150",
-      "top1": "Discoloured Spots (95%)",       
-      "top2": "Benign Nevus (3.5%)",          
-      "top3": "Skin Cancer (1.5%)",     
+      "top1": "Discoloured Spots (95%)",
+      "top2": "Benign Nevus (3.5%)",
+      "top3": "Skin Cancer (1.5%)",
     },
     {
       "date": "Oct 10, 2026",
@@ -22,61 +22,58 @@ class HistoryPage extends StatelessWidget {
       "severity": "Medium",
       "Model Prediction Accuracy": "89%",
       "imageUrl": "https://via.placeholder.com/150",
-      "top1": "Contact Dermatitis / Rash (89%)", 
-      "top2": "Eczema (8%)",                  
-      "top3": "Fungal Infection (3%)",           
-    }
+      "top1": "Contact Dermatitis / Rash (89%)",
+      "top2": "Eczema (8%)",
+      "top3": "Fungal Infection (3%)",
+    },
   ];
-
-  
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surface,
-           appBar: AppBar( 
-        toolbarHeight: 90, // <--- This makes the bar taller so the text has room to breathe
+      appBar: AppBar(
+        toolbarHeight: 90,
+        automaticallyImplyLeading: false,
+        centerTitle: true,
         title: const Padding(
-          padding: EdgeInsets.only(top: 26.0, bottom: 10.0  ), // <--- This physically pushes the text lower
+          padding: EdgeInsets.only(top: 26.0, bottom: 10.0),
           child: Text(
-            ' Diagnostic History',
+            'Diagnostic History',
             style: TextStyle(
               fontFamily: 'Raleway',
               fontSize: 28,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w500,
               color: AppColors.sand,
             ),
           ),
         ),
         backgroundColor: AppColors.surface,
         elevation: 0,
-        centerTitle: false,
       ),
-
-     
 
       body: ListView.builder(
         itemCount: hardcodedScans.length,
         padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
         itemBuilder: (context, index) {
           final scan = hardcodedScans[index];
-          
+
           // Determine color and icon based on severity
-              
+
           Color severityColor = AppColors.sand;
           IconData severityIcon = Icons.info;
-          
+
           if (scan["severity"] == "Low Risk") {
             severityColor = AppColors.severityLow;
             severityIcon = Icons.check_circle;
-          } else if (scan["severity"] == "Requires Monitor" || scan["severity"] == "Medium") {
+          } else if (scan["severity"] == "Requires Monitor" ||
+              scan["severity"] == "Medium") {
             severityColor = AppColors.severityMedium;
             severityIcon = Icons.warning_rounded;
           } else if (scan["severity"]!.contains("High")) {
             severityColor = AppColors.severityHigh;
             severityIcon = Icons.error_rounded;
           }
-
 
           return GestureDetector(
             onTap: () {
@@ -93,18 +90,24 @@ class HistoryPage extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.elevated,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.warmGold.withOpacity(0.3), width: 1),
+                border: Border.all(
+                  color: AppColors.warmGold.withOpacity(0.3),
+                  width: 1,
+                ),
               ),
               child: Row(
                 children: [
-                                    Container(
+                  Container(
                     width: 60,
                     height: 60,
                     decoration: BoxDecoration(
                       color: AppColors.surface,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(Icons.broken_image, color: AppColors.sand),
+                    child: const Icon(
+                      Icons.broken_image,
+                      color: AppColors.sand,
+                    ),
                   ),
 
                   const SizedBox(width: 16),
@@ -135,7 +138,11 @@ class HistoryPage extends StatelessWidget {
                             ),
                             Row(
                               children: [
-                                Icon(severityIcon, color: severityColor, size: 14),
+                                Icon(
+                                  severityIcon,
+                                  color: severityColor,
+                                  size: 14,
+                                ),
                                 const SizedBox(width: 4),
                                 Text(
                                   scan["severity"]!,
@@ -154,7 +161,11 @@ class HistoryPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const Icon(Icons.arrow_forward_ios, color: AppColors.sand, size: 16),
+                  const Icon(
+                    Icons.arrow_forward_ios,
+                    color: AppColors.sand,
+                    size: 16,
+                  ),
                 ],
               ),
             ),
