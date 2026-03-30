@@ -30,7 +30,8 @@ class _LoginPageState extends State<LoginPage> {
             child: Center(
               child: Column(
                 children: [
-                  const SizedBox(height: 24),
+
+                  SizedBox(height: 20),
 
                   Align(
                     alignment: Alignment.centerLeft,
@@ -39,6 +40,9 @@ class _LoginPageState extends State<LoginPage> {
                       icon: const Icon(Icons.arrow_back, color: AppColors.sand),
                     ),
                   ),
+                  const SizedBox(height: 80),
+
+                  
 
                   const SizedBox(height: 30),
 
@@ -46,7 +50,7 @@ class _LoginPageState extends State<LoginPage> {
                     'Login',
                     style: TextStyle(
                       fontFamily: 'Raleway',
-                      fontSize: 30,
+                      fontSize: 38,
                       fontWeight: FontWeight.w400,
                       color: AppColors.sand,
                     ),
@@ -146,10 +150,10 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       child: const Text(
-                        'Login',
+                        'Continue',
                         style: TextStyle(
                           fontFamily: 'Raleway',
-                          fontSize: 15,
+                          fontSize: 17,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
