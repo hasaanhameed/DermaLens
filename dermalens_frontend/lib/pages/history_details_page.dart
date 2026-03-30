@@ -116,6 +116,86 @@ class HistoryDetailsPage extends StatelessWidget {
                     ],
                   ),
 
+                                    const SizedBox(height: 24),
+                  
+                  // Interactive Breakdown Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.surface, // matching the background
+                        side: const BorderSide(color: AppColors.warmGold, width: 0.5),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      icon: const Icon(Icons.bar_chart, color: AppColors.warmGold),
+                      label: const Text(
+                        'View AI Breakdown',
+                        style: TextStyle(
+                          fontFamily: 'Raleway', 
+                          color: AppColors.warmGold, 
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      onPressed: () {
+                        // This opens the pop-up window
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              backgroundColor: AppColors.elevated,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                                side: BorderSide(color: AppColors.warmGold.withOpacity(0.5)),
+                              ),
+                              title: const Text(
+                                'Softmax Probabilities',
+                                style: TextStyle(fontFamily: 'Raleway', color: AppColors.warmGold, fontWeight: FontWeight.bold),
+                              ),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min, // Hugs to the content
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Top 3 Model Activations:',
+                                    style: TextStyle(fontFamily: 'Raleway', color: AppColors.sand, fontSize: 13),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    '1. ${scanData["top1"] ?? "Unknown"}', 
+                                    style: const TextStyle(fontFamily: 'Raleway', color: AppColors.severityLow, fontSize: 16, fontWeight: FontWeight.bold)
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    '2. ${scanData["top2"] ?? "Unknown"}', 
+                                    style: TextStyle(fontFamily: 'Raleway', color: AppColors.sand.withOpacity(0.8), fontSize: 15)
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    '3. ${scanData["top3"] ?? "Unknown"}', 
+                                    style: TextStyle(fontFamily: 'Raleway', color: AppColors.sand.withOpacity(0.5), fontSize: 15)
+                                  ),
+                                ],
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: const Text('Close', style: TextStyle(color: AppColors.sand, fontFamily: 'Raleway')),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+
+
+
+
+                
+
                 ],
               ),
             ),

@@ -5,13 +5,16 @@ import 'history_details_page.dart';
 class HistoryPage extends StatelessWidget {
   HistoryPage({super.key});
 
-  final List<Map<String, String>> hardcodedScans = [
+   final List<Map<String, String>> hardcodedScans = [
     {
       "date": "Oct 24, 2026",
       "condition": "Discoloured Spots",
       "severity": "Low Risk",
       "Model Prediction Accuracy": "95%",
       "imageUrl": "https://via.placeholder.com/150",
+      "top1": "Discoloured Spots (95%)",       // <--- ADDED
+      "top2": "Benign Nevus (3.5%)",           // <--- ADDED
+      "top3": "Skin Cancer (1.5%)",      // <--- ADDED
     },
     {
       "date": "Oct 10, 2026",
@@ -19,8 +22,13 @@ class HistoryPage extends StatelessWidget {
       "severity": "Medium",
       "Model Prediction Accuracy": "89%",
       "imageUrl": "https://via.placeholder.com/150",
+      "top1": "Contact Dermatitis / Rash (89%)", // <--- ADDED
+      "top2": "Eczema (8%)",                  // <--- ADDED
+      "top3": "Fungal Infection (3%)",           // <--- ADDED
     }
   ];
+
+  
 
   @override
   Widget build(BuildContext context) {
