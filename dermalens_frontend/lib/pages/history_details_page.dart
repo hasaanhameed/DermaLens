@@ -130,7 +130,7 @@ class HistoryDetailsPage extends StatelessWidget {
                       ),
                       icon: const Icon(Icons.bar_chart, color: AppColors.warmGold),
                       label: const Text(
-                        'View AI Breakdown',
+                        'Deep Learning Breakdown',
                         style: TextStyle(
                           fontFamily: 'Raleway', 
                           color: AppColors.warmGold, 
@@ -204,7 +204,7 @@ class HistoryDetailsPage extends StatelessWidget {
             
             // AI Recommendation text
             const Text(
-              'AI Recommendation',
+              'Diagnosis and Recommendations:',
               style: TextStyle(
                 fontFamily: 'Raleway',
                 color: AppColors.sand,
@@ -212,9 +212,9 @@ class HistoryDetailsPage extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             const Text(
-              'No significant irregularities detected by the deep learning model. Continue to monitor the area for any changes in color or borders over the next 30 days.',
+              'No significant issues detected. Continue to monitor the area for any changes in color and consult a doctor in case of pain or unease.',
               style: TextStyle(
                 fontFamily: 'Raleway',
                 color: AppColors.sand,

@@ -12,9 +12,9 @@ class HistoryPage extends StatelessWidget {
       "severity": "Low Risk",
       "Model Prediction Accuracy": "95%",
       "imageUrl": "https://via.placeholder.com/150",
-      "top1": "Discoloured Spots (95%)",       // <--- ADDED
-      "top2": "Benign Nevus (3.5%)",           // <--- ADDED
-      "top3": "Skin Cancer (1.5%)",      // <--- ADDED
+      "top1": "Discoloured Spots (95%)",       
+      "top2": "Benign Nevus (3.5%)",          
+      "top3": "Skin Cancer (1.5%)",     
     },
     {
       "date": "Oct 10, 2026",
@@ -22,9 +22,9 @@ class HistoryPage extends StatelessWidget {
       "severity": "Medium",
       "Model Prediction Accuracy": "89%",
       "imageUrl": "https://via.placeholder.com/150",
-      "top1": "Contact Dermatitis / Rash (89%)", // <--- ADDED
-      "top2": "Eczema (8%)",                  // <--- ADDED
-      "top3": "Fungal Infection (3%)",           // <--- ADDED
+      "top1": "Contact Dermatitis / Rash (89%)", 
+      "top2": "Eczema (8%)",                  
+      "top3": "Fungal Infection (3%)",           
     }
   ];
 
@@ -34,20 +34,27 @@ class HistoryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surface,
-      appBar: AppBar(
-        title: const Text(
-          'Diagnostic History',
-          style: TextStyle(
-            fontFamily: 'Raleway',
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: AppColors.sand,
+           appBar: AppBar( 
+        toolbarHeight: 90, // <--- This makes the bar taller so the text has room to breathe
+        title: const Padding(
+          padding: EdgeInsets.only(top: 26.0, bottom: 10.0  ), // <--- This physically pushes the text lower
+          child: Text(
+            ' Diagnostic History',
+            style: TextStyle(
+              fontFamily: 'Raleway',
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: AppColors.sand,
+            ),
           ),
         ),
         backgroundColor: AppColors.surface,
         elevation: 0,
         centerTitle: false,
       ),
+
+     
+
       body: ListView.builder(
         itemCount: hardcodedScans.length,
         padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
