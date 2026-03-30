@@ -1,6 +1,8 @@
+import 'package:dermalens/pages/welcome_page.dart';
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
-import '../widget_tree.dart';
+import 'edit_profile_page.dart';
+import 'terms_page.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -87,7 +89,12 @@ class ProfilePage extends StatelessWidget {
             _buildListTile(
               icon: Icons.edit_outlined,
               title: 'Edit Profile',
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const EditProfilePage()),
+                );
+              },
             ),
 
             const SizedBox(height: 24),
@@ -101,7 +108,12 @@ class ProfilePage extends StatelessWidget {
             _buildListTile(
               icon: Icons.privacy_tip_outlined,
               title: 'Privacy Policy and Terms',
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const TermsPage()),
+                );
+              },
             ),
 
             const SizedBox(height: 32),
@@ -111,10 +123,11 @@ class ProfilePage extends StatelessWidget {
               child: ElevatedButton.icon(
                 onPressed: () {
                   // Navigate back to home page (Tab 0 resets)
-                  Navigator.pushAndRemoveUntil(
+                  Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const WidgetTree()),
-                    (route) => false,
+                    MaterialPageRoute(
+                      builder: (context) => const WelcomePage(),
+                    ),
                   );
                 },
                 icon: const Icon(Icons.logout, color: AppColors.surface),
