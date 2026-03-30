@@ -258,6 +258,22 @@ class _SignupPageState extends State<SignupPage> {
                       height: 54,
                       child: ElevatedButton(
                         onPressed: () {
+                          if (!_agreedToTerms) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'You must agree to the Terms & Conditions first',
+                                  style: TextStyle(
+                                    fontFamily: 'Raleway',
+                                    color: AppColors.elevated,
+                                  ),
+                                ),
+                                backgroundColor: AppColors.sand,
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            return;
+                          }
                           Navigator.popUntil(context, (route) => route.isFirst);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(

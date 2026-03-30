@@ -46,7 +46,6 @@ class HomePage extends StatelessWidget {
               const SizedBox(height: 16),
 
               // The Single "Scan Now" Button
-              // The Single "Scan Now" Button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -67,8 +66,7 @@ class HomePage extends StatelessWidget {
                         width: 0.5,
                       ),
                     ),
-                    elevation:
-                        0, // Set to 0 so it matches your flat, sleek design
+                    elevation: 0,
                   ),
                   child: const Column(
                     children: [
