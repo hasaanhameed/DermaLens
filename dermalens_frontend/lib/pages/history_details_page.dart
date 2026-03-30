@@ -8,98 +8,139 @@ class HistoryDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 1. Grab Current Theme Variables!
+    final theme = Theme.of(context);
+        
+
+    final bgColor = theme.scaffoldBackgroundColor;
+    final cardColor = theme.cardColor;
+    final textColor = theme.colorScheme.onSurface;
+        final accentColor = theme.colorScheme.primary; // Mapped to gold in dark, black in light!
+
+
     return Scaffold(
-      backgroundColor: AppColors.surface,
+      backgroundColor: bgColor,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Analysis Results',
           style: TextStyle(
             fontFamily: 'Raleway',
-            fontSize: 20,
+            fontSize: 22,
             fontWeight: FontWeight.bold,
-            color: AppColors.sand,
+            color: textColor, // <--- Dynamic text
           ),
         ),
-        backgroundColor: AppColors.surface,
+        backgroundColor: bgColor, // <--- Dynamic bg
         elevation: 0,
-        iconTheme: const IconThemeData(color: AppColors.sand), // Makes back button sand colored
+        centerTitle: false,
+        iconTheme: IconThemeData(color: textColor), // <--- Dynamic back arrow color
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // The Image
-            Container(
-              height: 300,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                image: DecorationImage(
-                  image: NetworkImage(scanData["imageUrl"]!),
-                  fit: BoxFit.cover,
+            // 1. Image Preview Box
+            Center(
+              child: Container(
+                width: 250,
+                height: 250,
+                decoration: BoxDecoration(
+                  color: cardColor, // <--- Dynamic inner box
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: accentColor.withValues(alpha: 0.5), width: 1),
                 ),
-                border: Border.all(color: AppColors.warmGold, width: 0.5),
+                child: Icon(Icons.broken_image, color: textColor.withValues(alpha: 0.5), size: 64),
               ),
             ),
-            const SizedBox(height: 32),
             
-            // The Analysis Data
+            const SizedBox(height: 32),
+
+            // 2. The Analysis Data
             Container(
-              width: double.infinity,
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppColors.elevated,
+                color: cardColor, // <--- Dynamic Card
                 borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: textColor.withValues(alpha: 0.1), width: 1), 
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    scanData["date"]!.toUpperCase(),
-                    style: TextStyle(
-                      fontFamily: 'Raleway',
-                      color: AppColors.sand.withValues(alpha: 0.7),
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    scanData["condition"]!,
-                    style: const TextStyle(
-                      fontFamily: 'Raleway',
-                      color: AppColors.warmGold,
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Icon(Icons.info_outline, color: AppColors.sand, size: 20),
-                      const SizedBox(width: 8),
                       Text(
-                        'Severity: ${scanData["severity"]}',
-                        style: const TextStyle(
+                        'Diagnosis',
+                        style: TextStyle(
                           fontFamily: 'Raleway',
-                          color: AppColors.sand,
-                          fontSize: 16,
+                          color: accentColor, // Gold fixed
+                          fontSize: 18,
                           fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        scanData["date"]!.toUpperCase(),
+                        style: TextStyle(
+                          fontFamily: 'Raleway',
+                          color: textColor.withValues(alpha: 0.7), // <--- Dynamic
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
                   ),
-                                    const SizedBox(height: 12),
+                  const SizedBox(height: 8),
+                  Text(
+                    scanData["condition"]!,
+                    style: TextStyle(
+                      fontFamily: 'Raleway',
+                      color: textColor, // <--- Dynamic
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 24),
+                  
+                  // Severity Row
                   Row(
                     children: [
-                      const Icon(Icons.analytics_outlined, color: AppColors.warmGold, size: 20),
+                      Icon(Icons.shield_outlined, color: accentColor, size: 20),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Severity: ',
+                        style: TextStyle(
+                          fontFamily: 'Raleway',
+                          color: textColor, // <--- Dynamic
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        scanData["severity"]!,
+                        style: TextStyle(
+                          fontFamily: 'Raleway',
+                          color: accentColor, // Keep Gold fixed
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  
+                  const SizedBox(height: 12),
+                  
+                  // Model Prediction row
+                  Row(
+                    children: [
+                      Icon(Icons.analytics_outlined, color: accentColor, size: 20),
                       const SizedBox(width: 8),
                       Text(
                         'AI Prediction Confidence: ',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Raleway',
-                          color: AppColors.sand,
+                          color: textColor, // <--- Dynamic
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
@@ -108,7 +149,7 @@ class HistoryDetailsPage extends StatelessWidget {
                         scanData["Model Prediction Accuracy"] ?? "N/A",
                         style: const TextStyle(
                           fontFamily: 'Raleway',
-                          color: AppColors.severityLow,
+                          color: AppColors.severityLow, // Keep Green fixed
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
@@ -116,24 +157,24 @@ class HistoryDetailsPage extends StatelessWidget {
                     ],
                   ),
 
-                                    const SizedBox(height: 24),
+                  const SizedBox(height: 24),
                   
                   // Interactive Breakdown Button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.surface, // matching the background
-                        side: BorderSide(color: AppColors.warmGold.withValues(alpha: 0.5)),
+                        backgroundColor: cardColor, // <--- Dynamic Card button background
+                        side: BorderSide(color: accentColor.withValues(alpha: 0.5)),
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
-                      icon: const Icon(Icons.bar_chart, color: AppColors.warmGold),
-                      label: const Text(
+                      icon: Icon(Icons.bar_chart, color: accentColor),
+                      label: Text(
                         'Deep Learning Breakdown',
                         style: TextStyle(
                           fontFamily: 'Raleway', 
-                          color: AppColors.warmGold, 
+                          color: accentColor, 
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
@@ -144,22 +185,22 @@ class HistoryDetailsPage extends StatelessWidget {
                           context: context,
                           builder: (context) {
                             return AlertDialog(
-                              backgroundColor: AppColors.elevated,
+                              backgroundColor: cardColor, // <--- Dynamic Dialog background
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
-                                side: BorderSide(color: AppColors.warmGold.withValues(alpha: 0.5)),
+                                side: BorderSide(color: accentColor.withValues(alpha: 0.5)),
                               ),
-                              title: const Text(
+                              title: Text(
                                 'Softmax Probabilities',
-                                style: TextStyle(fontFamily: 'Raleway', color: AppColors.warmGold, fontWeight: FontWeight.bold),
+                                style: TextStyle(fontFamily: 'Raleway', color: accentColor, fontWeight: FontWeight.bold),
                               ),
                               content: Column(
                                 mainAxisSize: MainAxisSize.min, // Hugs to the content
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
+                                  Text(
                                     'Top 3 Model Activations:',
-                                    style: TextStyle(fontFamily: 'Raleway', color: AppColors.sand, fontSize: 13),
+                                    style: TextStyle(fontFamily: 'Raleway', color: textColor, fontSize: 13), // <--- Dynamic
                                   ),
                                   const SizedBox(height: 16),
                                   Text(
@@ -168,20 +209,20 @@ class HistoryDetailsPage extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 12),
                                   Text(
-                                    '2. ${scanData["top2"] ?? "Unknown"}',
-                                    style: TextStyle(fontFamily: 'Raleway', color: AppColors.sand.withValues(alpha: 0.8), fontSize: 15)
+                                    '2. ${scanData["top2"] ?? "Unknown"}', 
+                                    style: TextStyle(fontFamily: 'Raleway', color: textColor.withValues(alpha: 0.8), fontSize: 15) // <--- Dynamic
                                   ),
-                                  const SizedBox(height: 6,),
+                                  const SizedBox(height: 6),
                                   Text(
-                                    '3. ${scanData["top3"] ?? "Unknown"}',
-                                    style: TextStyle(fontFamily: 'Raleway', color: AppColors.sand.withValues(alpha: 0.5), fontSize: 15)
+                                    '3. ${scanData["top3"] ?? "Unknown"}', 
+                                    style: TextStyle(fontFamily: 'Raleway', color: textColor.withValues(alpha: 0.5), fontSize: 15) // <--- Dynamic
                                   ),
                                 ],
                               ),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(context),
-                                  child: const Text('Close', style: TextStyle(color: AppColors.sand, fontFamily: 'Raleway')),
+                                  child: Text('Close', style: TextStyle(color: textColor, fontFamily: 'Raleway')), // <--- Dynamic
                                 ),
                               ],
                             );
@@ -190,12 +231,6 @@ class HistoryDetailsPage extends StatelessWidget {
                       },
                     ),
                   ),
-
-
-
-
-                
-
                 ],
               ),
             ),
@@ -203,32 +238,28 @@ class HistoryDetailsPage extends StatelessWidget {
             const SizedBox(height: 24),
             
             // AI Recommendation text
-            const Text(
+            Text(
               'Diagnosis and Recommendations:',
               style: TextStyle(
                 fontFamily: 'Raleway',
-                color: AppColors.sand,
-                fontSize: 18,
+                color: textColor, // <--- Dynamic
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'No significant issues detected. Continue to monitor the area for any changes in color and consult a doctor in case of pain or unease.',
               style: TextStyle(
                 fontFamily: 'Raleway',
-                color: AppColors.sand,
-                fontSize: 15,
+                color: textColor.withValues(alpha: 0.8), // <--- Dynamic
+                fontSize: 14,
                 height: 1.5,
               ),
             ),
           ],
         ),
-        
-
-
       ),
     );
   }
 }
-

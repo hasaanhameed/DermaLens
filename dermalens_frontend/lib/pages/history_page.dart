@@ -30,28 +30,36 @@ class HistoryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 1. Grab Current Theme Variables!
+    final theme = Theme.of(context);
+
+    final bgColor = theme.scaffoldBackgroundColor;
+    final cardColor = theme.cardColor;
+    final textColor = theme.colorScheme.onSurface;
+        final accentColor = theme.colorScheme.primary; // Mapped to gold in dark, black in light!
+
+
     return Scaffold(
-      backgroundColor: AppColors.surface,
+      backgroundColor: bgColor,
       appBar: AppBar(
         toolbarHeight: 90,
         automaticallyImplyLeading: false,
         centerTitle: true,
-        title: const Padding(
-          padding: EdgeInsets.only(top: 26.0, bottom: 10.0),
+        title: Padding(
+          padding: const EdgeInsets.only(top: 26.0, bottom: 10.0),
           child: Text(
             'Diagnostic History',
             style: TextStyle(
               fontFamily: 'Raleway',
               fontSize: 28,
               fontWeight: FontWeight.w500,
-              color: AppColors.sand,
+              color: textColor, // <--- Dynamic text
             ),
           ),
         ),
-        backgroundColor: AppColors.surface,
+        backgroundColor: bgColor, // <--- Dynamic bg
         elevation: 0,
       ),
-
       body: ListView.builder(
         itemCount: hardcodedScans.length,
         padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
@@ -59,8 +67,7 @@ class HistoryPage extends StatelessWidget {
           final scan = hardcodedScans[index];
 
           // Determine color and icon based on severity
-
-          Color severityColor = AppColors.sand;
+          Color severityColor = textColor;
           IconData severityIcon = Icons.info;
 
           if (scan["severity"] == "Low Risk") {
@@ -88,10 +95,10 @@ class HistoryPage extends StatelessWidget {
               margin: const EdgeInsets.only(bottom: 16.0),
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.elevated,
+                color: cardColor, // <--- Dynamic Card
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: AppColors.warmGold.withValues(alpha: 0.3),
+                  color: accentColor.withValues(alpha: 0.3),
                   width: 1,
                 ),
               ),
@@ -101,15 +108,14 @@ class HistoryPage extends StatelessWidget {
                     width: 60,
                     height: 60,
                     decoration: BoxDecoration(
-                      color: AppColors.surface,
+                      color: bgColor, // <--- Dynamic inner box
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.broken_image,
-                      color: AppColors.sand,
+                      color: textColor, // <--- Dynamic icon
                     ),
                   ),
-
                   const SizedBox(width: 16),
                   Expanded(
                     child: Column(
@@ -117,9 +123,9 @@ class HistoryPage extends StatelessWidget {
                       children: [
                         Text(
                           scan["condition"]!,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'Raleway',
-                            color: AppColors.warmGold,
+                            color: accentColor, // Keep Gold fixed
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
@@ -130,9 +136,9 @@ class HistoryPage extends StatelessWidget {
                           children: [
                             Text(
                               scan["date"]!,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontFamily: 'Raleway',
-                                color: AppColors.sand,
+                                color: textColor, // <--- Dynamic Date
                                 fontSize: 13,
                               ),
                             ),
@@ -161,9 +167,9 @@ class HistoryPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const Icon(
+                  Icon(
                     Icons.arrow_forward_ios,
-                    color: AppColors.sand,
+                    color: textColor.withValues(alpha: 0.4), // <--- Dynamic chevron
                     size: 16,
                   ),
                 ],

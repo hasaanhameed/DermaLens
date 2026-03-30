@@ -6,8 +6,17 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 1. Grab the current theme (which magically updates when the toggle is flipped!)
+    final theme = Theme.of(context);
+
+    final bgColor = theme.scaffoldBackgroundColor;
+    final cardColor = theme.cardColor;
+    final textColor = theme.colorScheme.onSurface; // DeepVoid for light mode, Sand for dark mode
+        final accentColor = theme.colorScheme.primary; // Mapped to gold in dark, black in light!
+
+
     return Scaffold(
-      backgroundColor: AppColors.surface, // The base dark surface
+      backgroundColor: bgColor, 
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
@@ -19,22 +28,22 @@ class HomePage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 20),
-                  const Text(
+                  Text(
                     'Welcome, Hasaan!',
                     style: TextStyle(
                       fontFamily: 'Raleway',
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.sand,
+                      color: textColor, // <--- Dynamic text!
                     ),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
+                  Text(
                     'Ready to start your skincare journey?',
                     style: TextStyle(
                       fontFamily: 'Raleway',
                       fontSize: 17,
-                      color: AppColors.sand,
+                      color: textColor,
                     ),
                   ),
                 ],
@@ -50,50 +59,35 @@ class HomePage extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    // For now, it just prints to the terminal, routing comes later!
                     print("Scan Button Clicked!");
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.elevated,
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 32,
-                      horizontal: 24,
-                    ),
+                    backgroundColor: cardColor, // <--- Dynamic Card background!
+                    padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
-                      side: const BorderSide(
-                        color: AppColors.warmGold,
-                        width: 0.5,
-                      ),
+                      side: BorderSide(color: accentColor, width: 0.5),
                     ),
                     elevation: 0,
                   ),
-                  child: const Column(
+                  child: Column(
                     children: [
-                      Icon(
-                        Icons.center_focus_strong,
-                        color: AppColors.warmGold,
-                        size: 56,
-                      ),
-                      SizedBox(height: 16),
+                      Icon(Icons.center_focus_strong, color: accentColor, size: 56),
+                      const SizedBox(height: 16),
                       Text(
                         'Scan Image',
                         style: TextStyle(
                           fontFamily: 'Raleway',
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.warmGold,
+                          color: accentColor, // Keep Gold fixed
                         ),
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text(
                         'AI analysis of skin lesions',
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontFamily: 'Raleway',
-                          fontSize: 14,
-                          color: AppColors.sand,
-                        ),
+                        style: TextStyle(fontFamily: 'Raleway', fontSize: 14, color: textColor),
                       ),
                     ],
                   ),
@@ -107,10 +101,11 @@ class HomePage extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: AppColors.surface,
+                  color: bgColor.withOpacity(0.5),
                   borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: textColor.withOpacity(0.2), width: 1), // Subtle dynamic border
                 ),
-                child: const Column(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
@@ -119,10 +114,10 @@ class HomePage extends StatelessWidget {
                         fontFamily: 'Raleway',
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.warmGold,
+                        color: accentColor, // Keep Gold fixed
                       ),
                     ),
-                    SizedBox(height: 12),
+                    const SizedBox(height: 12),
                     Text(
                       '1. Tap the Scan Image button above.\n'
                       '2. Take or upload a clear, well-lit photo of the affected area.\n'
@@ -131,9 +126,8 @@ class HomePage extends StatelessWidget {
                       style: TextStyle(
                         fontFamily: 'Raleway',
                         fontSize: 14,
-                        height:
-                            1.6, // Adding line height to make it spaced out and readable
-                        color: AppColors.sand,
+                        height: 1.6, 
+                        color: textColor, // Dynamic text!
                       ),
                     ),
                   ],
@@ -147,39 +141,26 @@ class HomePage extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.surface,
+                  color: bgColor,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppColors.sand),
+                  border: Border.all(color: textColor.withOpacity(0.1), width: 1),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(
-                      Icons.lightbulb_outline,
-                      color: AppColors.warmGold,
-                      size: 32,
-                    ),
-                    SizedBox(width: 16),
+                    Icon(Icons.lightbulb_outline, color: accentColor, size: 32),
+                    const SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             'Skincare Tip of the Day',
-                            style: TextStyle(
-                              fontFamily: 'Raleway',
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.sand,
-                            ),
+                            style: TextStyle(fontFamily: 'Raleway', fontSize: 16, fontWeight: FontWeight.bold, color: textColor),
                           ),
-                          SizedBox(height: 4),
+                          const SizedBox(height: 4),
                           Text(
                             'Remember to apply sunscreen even on cloudy days!',
-                            style: TextStyle(
-                              fontFamily: 'Raleway',
-                              fontSize: 13,
-                              color: AppColors.sand,
-                            ),
+                            style: TextStyle(fontFamily: 'Raleway', fontSize: 13, color: textColor.withOpacity(0.8)),
                           ),
                         ],
                       ),
