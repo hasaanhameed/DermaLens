@@ -91,7 +91,7 @@ class HistoryPage extends StatelessWidget {
                 color: AppColors.elevated,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: AppColors.warmGold.withOpacity(0.3),
+                  color: AppColors.warmGold.withValues(alpha: 0.3),
                   width: 1,
                 ),
               ),

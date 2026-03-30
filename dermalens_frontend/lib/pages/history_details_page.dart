@@ -59,8 +59,8 @@ class HistoryDetailsPage extends StatelessWidget {
                     scanData["date"]!.toUpperCase(),
                     style: TextStyle(
                       fontFamily: 'Raleway',
-                      color: AppColors.sand.withOpacity(0.7),
-                      fontSize: 12,
+                      color: AppColors.sand.withValues(alpha: 0.7),
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -124,8 +124,8 @@ class HistoryDetailsPage extends StatelessWidget {
                     child: ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.surface, // matching the background
-                        side: const BorderSide(color: AppColors.warmGold, width: 0.5),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        side: BorderSide(color: AppColors.warmGold.withValues(alpha: 0.5)),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                       icon: const Icon(Icons.bar_chart, color: AppColors.warmGold),
@@ -147,7 +147,7 @@ class HistoryDetailsPage extends StatelessWidget {
                               backgroundColor: AppColors.elevated,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
-                                side: BorderSide(color: AppColors.warmGold.withOpacity(0.5)),
+                                side: BorderSide(color: AppColors.warmGold.withValues(alpha: 0.5)),
                               ),
                               title: const Text(
                                 'Softmax Probabilities',
@@ -168,13 +168,13 @@ class HistoryDetailsPage extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 12),
                                   Text(
-                                    '2. ${scanData["top2"] ?? "Unknown"}', 
-                                    style: TextStyle(fontFamily: 'Raleway', color: AppColors.sand.withOpacity(0.8), fontSize: 15)
+                                    '2. ${scanData["top2"] ?? "Unknown"}',
+                                    style: TextStyle(fontFamily: 'Raleway', color: AppColors.sand.withValues(alpha: 0.8), fontSize: 15)
                                   ),
-                                  const SizedBox(height: 12),
+                                  const SizedBox(height: 6,),
                                   Text(
-                                    '3. ${scanData["top3"] ?? "Unknown"}', 
-                                    style: TextStyle(fontFamily: 'Raleway', color: AppColors.sand.withOpacity(0.5), fontSize: 15)
+                                    '3. ${scanData["top3"] ?? "Unknown"}',
+                                    style: TextStyle(fontFamily: 'Raleway', color: AppColors.sand.withValues(alpha: 0.5), fontSize: 15)
                                   ),
                                 ],
                               ),

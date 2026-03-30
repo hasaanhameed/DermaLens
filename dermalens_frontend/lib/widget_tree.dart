@@ -4,6 +4,7 @@ import '../theme/app_colors.dart';
 import '../widgets/footer_widget.dart';
 import '../pages/history_page.dart';
 import '../pages/home_page.dart';
+import '../pages/profile_page.dart';
 import '../widgets/header_widget.dart';
 
 class WidgetTree extends StatefulWidget {
@@ -16,18 +17,7 @@ class WidgetTree extends StatefulWidget {
 class _WidgetTreeState extends State<WidgetTree> {
   final _navigationNotifier = NavigationNotifier();
 
-  // 2. We create a list of pages for the bottom navigation bar.
-  // The first is HomePage. The other two are temporary placeholders.
-  final List<Widget> _pages = [
-    const HomePage(),
-    HistoryPage(),
-    const Center(
-      child: Text(
-        "Profile Page (Coming Soon)",
-        style: TextStyle(color: AppColors.sand, fontFamily: 'Raleway'),
-      ),
-    ),
-  ];
+  final List<Widget> _pages = [HomePage(), HistoryPage(), ProfilePage()];
 
   @override
   void dispose() {
