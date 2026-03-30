@@ -16,6 +16,8 @@ class HistoryDetailsPage extends StatelessWidget {
     final cardColor = theme.cardColor;
     final textColor = theme.colorScheme.onSurface;
         final accentColor = theme.colorScheme.primary; // Mapped to gold in dark, black in light!
+        final highlightColor = theme.brightness == Brightness.light ? AppColors.sand : cardColor;
+        final popupBgColor = theme.brightness == Brightness.light ? AppColors.cream : cardColor;
 
 
     return Scaffold(
@@ -164,7 +166,7 @@ class HistoryDetailsPage extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: cardColor, // <--- Dynamic Card button background
+                        backgroundColor: highlightColor, // <--- Highlighted button background
                         side: BorderSide(color: accentColor.withValues(alpha: 0.5)),
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -185,7 +187,7 @@ class HistoryDetailsPage extends StatelessWidget {
                           context: context,
                           builder: (context) {
                             return AlertDialog(
-                              backgroundColor: cardColor, // <--- Dynamic Dialog background
+                              backgroundColor: popupBgColor, // <--- Cream Dialog background in light mode
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
                                 side: BorderSide(color: accentColor.withValues(alpha: 0.5)),

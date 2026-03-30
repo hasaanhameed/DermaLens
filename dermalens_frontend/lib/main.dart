@@ -44,12 +44,12 @@ class MyApp extends StatelessWidget {
           theme: ThemeData( // This represents the 'lightTheme'
             brightness: Brightness.light,
             scaffoldBackgroundColor: AppColors.blush,   // Beautiful Cream Background
-            cardColor: Colors.white,                    // Solid white cards!
+            cardColor: AppColors.cream,                    // Off-white cream cards instead of stark white!
             colorScheme: const ColorScheme.light(
               surface: AppColors.blush,                 // The cream background
               onSurface: AppColors.deepVoid,            // Almost black text for readability
               primary: AppColors.deepVoid,              // Black accent instead of gold!
-              secondary: Colors.white,                  // We will use crisp white for some cards
+              secondary: AppColors.cream,                  // Soft cream alternative to white
             ),
             fontFamily: 'Raleway',
           ),

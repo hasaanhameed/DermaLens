@@ -89,8 +89,8 @@ class ProfilePage extends StatelessWidget {
             // THE MAGICAL DARK MODE SWITCH
             _buildListTile(
               context: context,
-              icon: Icons.dark_mode_outlined,
-              title: 'Dark Mode',
+              icon: ThemeNotifier().isLightMode ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+              title: ThemeNotifier().isLightMode ? 'Light Mode' : 'Dark Mode',
               trailing: Switch(
                 // True if theme is NOT light mode
                 value: !ThemeNotifier().isLightMode, 
