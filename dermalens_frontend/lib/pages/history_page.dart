@@ -8,14 +8,16 @@ class HistoryPage extends StatelessWidget {
   final List<Map<String, String>> hardcodedScans = [
     {
       "date": "Oct 24, 2026",
-      "condition": "Mild Acne",
+      "condition": "Discoloured Spots",
       "severity": "Low Risk",
+      "Model Prediction Accuracy": "95%",
       "imageUrl": "https://via.placeholder.com/150",
     },
     {
       "date": "Oct 10, 2026",
-      "condition": "Dry Spots",
+      "condition": "Rash",
       "severity": "Medium",
+      "Model Prediction Accuracy": "89%",
       "imageUrl": "https://via.placeholder.com/150",
     }
   ];

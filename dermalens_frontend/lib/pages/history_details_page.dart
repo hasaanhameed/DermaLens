@@ -90,6 +90,32 @@ class HistoryDetailsPage extends StatelessWidget {
                       ),
                     ],
                   ),
+                                    const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      const Icon(Icons.analytics_outlined, color: AppColors.warmGold, size: 20),
+                      const SizedBox(width: 8),
+                      Text(
+                        'AI Prediction Confidence: ',
+                        style: const TextStyle(
+                          fontFamily: 'Raleway',
+                          color: AppColors.sand,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        scanData["Model Prediction Accuracy"] ?? "N/A",
+                        style: const TextStyle(
+                          fontFamily: 'Raleway',
+                          color: AppColors.severityLow,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+
                 ],
               ),
             ),
@@ -118,7 +144,11 @@ class HistoryDetailsPage extends StatelessWidget {
             ),
           ],
         ),
+        
+
+
       ),
     );
   }
 }
+
