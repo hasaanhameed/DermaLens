@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:dermalens/theme/app_colors.dart';
 import 'package:image_picker/image_picker.dart';
 import 'history_details_page.dart';
-
-
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -15,12 +12,14 @@ class HomePage extends StatelessWidget {
 
     final bgColor = theme.scaffoldBackgroundColor;
     final cardColor = theme.cardColor;
-    final textColor = theme.colorScheme.onSurface; // DeepVoid for light mode, Sand for dark mode
-        final accentColor = theme.colorScheme.primary; // Mapped to gold in dark, black in light!
-
+    final textColor = theme
+        .colorScheme
+        .onSurface; // DeepVoid for light mode, Sand for dark mode
+    final accentColor =
+        theme.colorScheme.primary; // Mapped to gold in dark, black in light!
 
     return Scaffold(
-      backgroundColor: bgColor, 
+      backgroundColor: bgColor,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
@@ -58,7 +57,7 @@ class HomePage extends StatelessWidget {
               // 2. PRIMARY AI TOOL
               const SizedBox(height: 16),
 
-                          // 2. PRIMARY AI TOOLS (Dual Buttons)
+              // 2. PRIMARY AI TOOLS (Dual Buttons)
               const SizedBox(height: 16),
 
               Row(
@@ -69,33 +68,50 @@ class HomePage extends StatelessWidget {
                       onPressed: () async {
                         final ImagePicker picker = ImagePicker();
                         // Open the camera
-                        final XFile? image = await picker.pickImage(source: ImageSource.camera);
-                        
+                        final XFile? image = await picker.pickImage(
+                          source: ImageSource.camera,
+                        );
+
                         if (image != null) {
                           // 1. SHOW THE "ANALYZING" POP-UP NOTIFICATION
                           showDialog(
                             context: context,
-                            barrierDismissible: false, // Prevents user from clicking outside to close
+                            barrierDismissible:
+                                false, // Prevents user from clicking outside to close
                             builder: (BuildContext context) {
                               return Dialog(
-                                backgroundColor: cardColor, // Adapts to light/dark mode
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                backgroundColor:
+                                    cardColor, // Adapts to light/dark mode
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
                                 child: Padding(
                                   padding: const EdgeInsets.all(32.0),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      CircularProgressIndicator(color: accentColor),
+                                      CircularProgressIndicator(
+                                        color: accentColor,
+                                      ),
                                       const SizedBox(height: 24),
                                       Text(
                                         'Analyzing Image...',
-                                        style: TextStyle(fontFamily: 'Raleway', fontSize: 20, color: textColor, fontWeight: FontWeight.bold),
+                                        style: TextStyle(
+                                          fontFamily: 'Raleway',
+                                          fontSize: 20,
+                                          color: textColor,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                       const SizedBox(height: 12),
                                       Text(
                                         'Running deep learning models\nPlease hold on a moment.',
                                         textAlign: TextAlign.center,
-                                        style: TextStyle(fontFamily: 'Raleway', fontSize: 14, color: textColor.withOpacity(0.7)),
+                                        style: TextStyle(
+                                          fontFamily: 'Raleway',
+                                          fontSize: 14,
+                                          color: textColor.withOpacity(0.7),
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -119,7 +135,7 @@ class HomePage extends StatelessWidget {
                             "condition": "Benign Nevus",
                             "severity": "Low Risk",
                             "Model Prediction Accuracy": "98%",
-                            "imageUrl": image.path, 
+                            "imageUrl": image.path,
                             "top1": "Benign Nevus (98%)",
                             "top2": "Melanoma (1.5%)",
                             "top3": "Basal Cell Carcinoma (0.5%)",
@@ -130,15 +146,20 @@ class HomePage extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => HistoryDetailsPage(scanData: newScanResult),
+                                builder: (context) =>
+                                    HistoryDetailsPage(scanData: newScanResult),
                               ),
                             );
                           }
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: cardColor, // <--- Dynamic Card background!
-                        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                        backgroundColor:
+                            cardColor, // <--- Dynamic Card background!
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 24,
+                          horizontal: 16,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
                           side: BorderSide(color: accentColor, width: 0.5),
@@ -148,7 +169,11 @@ class HomePage extends StatelessWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.camera_alt_outlined, color: accentColor, size: 48),
+                          Icon(
+                            Icons.camera_alt_outlined,
+                            color: accentColor,
+                            size: 48,
+                          ),
                           const SizedBox(height: 12),
                           Text(
                             'Take Photo',
@@ -156,7 +181,7 @@ class HomePage extends StatelessWidget {
                               fontFamily: 'Raleway',
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: accentColor, 
+                              color: accentColor,
                             ),
                           ),
                         ],
@@ -165,40 +190,56 @@ class HomePage extends StatelessWidget {
                   ),
 
                   const SizedBox(width: 16), // Space between buttons
-
                   // --- BUTTON 2: GALLERY ---
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () async {
                         final ImagePicker picker = ImagePicker();
                         // Open the gallery
-                        final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-                        
+                        final XFile? image = await picker.pickImage(
+                          source: ImageSource.gallery,
+                        );
+
                         if (image != null) {
                           // 1. SHOW THE "ANALYZING" POP-UP NOTIFICATION
                           showDialog(
                             context: context,
-                            barrierDismissible: false, // Prevents user from clicking outside to close
+                            barrierDismissible:
+                                false, // Prevents user from clicking outside to close
                             builder: (BuildContext context) {
                               return Dialog(
-                                backgroundColor: cardColor, // Adapts to light/dark mode
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                backgroundColor:
+                                    cardColor, // Adapts to light/dark mode
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
                                 child: Padding(
                                   padding: const EdgeInsets.all(32.0),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      CircularProgressIndicator(color: accentColor),
+                                      CircularProgressIndicator(
+                                        color: accentColor,
+                                      ),
                                       const SizedBox(height: 24),
                                       Text(
                                         'Analyzing Image...',
-                                        style: TextStyle(fontFamily: 'Raleway', fontSize: 20, color: textColor, fontWeight: FontWeight.bold),
+                                        style: TextStyle(
+                                          fontFamily: 'Raleway',
+                                          fontSize: 20,
+                                          color: textColor,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                       const SizedBox(height: 12),
                                       Text(
                                         'Running deep learning models\nPlease hold on a moment.',
                                         textAlign: TextAlign.center,
-                                        style: TextStyle(fontFamily: 'Raleway', fontSize: 14, color: textColor.withOpacity(0.7)),
+                                        style: TextStyle(
+                                          fontFamily: 'Raleway',
+                                          fontSize: 14,
+                                          color: textColor.withOpacity(0.7),
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -222,7 +263,7 @@ class HomePage extends StatelessWidget {
                             "condition": "Benign Nevus",
                             "severity": "Low Risk",
                             "Model Prediction Accuracy": "98%",
-                            "imageUrl": image.path, 
+                            "imageUrl": image.path,
                             "top1": "Benign Nevus (98%)",
                             "top2": "Melanoma (1.5%)",
                             "top3": "Basal Cell Carcinoma (0.5%)",
@@ -233,15 +274,20 @@ class HomePage extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => HistoryDetailsPage(scanData: newScanResult),
+                                builder: (context) =>
+                                    HistoryDetailsPage(scanData: newScanResult),
                               ),
                             );
                           }
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: cardColor, // <--- Dynamic Card background!
-                        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                        backgroundColor:
+                            cardColor, // <--- Dynamic Card background!
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 24,
+                          horizontal: 16,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
                           side: BorderSide(color: accentColor, width: 0.5),
@@ -251,7 +297,11 @@ class HomePage extends StatelessWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.photo_library_outlined, color: accentColor, size: 48),
+                          Icon(
+                            Icons.photo_library_outlined,
+                            color: accentColor,
+                            size: 48,
+                          ),
                           const SizedBox(height: 12),
                           Text(
                             'Upload',
@@ -259,7 +309,7 @@ class HomePage extends StatelessWidget {
                               fontFamily: 'Raleway',
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: accentColor, 
+                              color: accentColor,
                             ),
                           ),
                         ],
@@ -267,7 +317,8 @@ class HomePage extends StatelessWidget {
                     ),
                   ),
                 ],
-              ),              const SizedBox(height: 24),
+              ),
+              const SizedBox(height: 24),
 
               // INSTRUCTIONS BOX
               Container(
@@ -276,7 +327,10 @@ class HomePage extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: bgColor.withOpacity(0.5),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: textColor.withOpacity(0.2), width: 1), // Subtle dynamic border
+                  border: Border.all(
+                    color: textColor.withOpacity(0.2),
+                    width: 1,
+                  ), // Subtle dynamic border
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -299,7 +353,7 @@ class HomePage extends StatelessWidget {
                       style: TextStyle(
                         fontFamily: 'Raleway',
                         fontSize: 14,
-                        height: 1.6, 
+                        height: 1.6,
                         color: textColor, // Dynamic text!
                       ),
                     ),
@@ -316,7 +370,10 @@ class HomePage extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: bgColor,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: textColor.withOpacity(0.1), width: 1),
+                  border: Border.all(
+                    color: textColor.withOpacity(0.1),
+                    width: 1,
+                  ),
                 ),
                 child: Row(
                   children: [
@@ -328,12 +385,21 @@ class HomePage extends StatelessWidget {
                         children: [
                           Text(
                             'Skincare Tip of the Day',
-                            style: TextStyle(fontFamily: 'Raleway', fontSize: 16, fontWeight: FontWeight.bold, color: textColor),
+                            style: TextStyle(
+                              fontFamily: 'Raleway',
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: textColor,
+                            ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             'Remember to apply sunscreen even on cloudy days!',
-                            style: TextStyle(fontFamily: 'Raleway', fontSize: 13, color: textColor.withOpacity(0.8)),
+                            style: TextStyle(
+                              fontFamily: 'Raleway',
+                              fontSize: 13,
+                              color: textColor.withOpacity(0.8),
+                            ),
                           ),
                         ],
                       ),

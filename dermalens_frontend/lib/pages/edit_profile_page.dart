@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../theme/app_colors.dart';
 import '../notifiers/theme_notifier.dart';
 
 class EditProfilePage extends StatefulWidget {
@@ -53,9 +52,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
               ),
               child: ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 4,
+                ),
                 leading: Icon(
-                  ThemeNotifier().isLightMode ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+                  ThemeNotifier().isLightMode
+                      ? Icons.light_mode_outlined
+                      : Icons.dark_mode_outlined,
                   color: textColor,
                 ),
                 title: Text(
@@ -77,18 +81,28 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   inactiveThumbColor: textColor,
                   inactiveTrackColor: cardColor,
                 ),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
               ),
             ),
 
             _buildEditField(
-              'Name', 'Hasaan', Icons.person_outline, 
-              textColor: textColor, cardColor: cardColor, accentColor: accentColor,
+              'Name',
+              'Hasaan',
+              Icons.person_outline,
+              textColor: textColor,
+              cardColor: cardColor,
+              accentColor: accentColor,
             ),
             const SizedBox(height: 16),
             _buildEditField(
-              'Email', 'hasaan@example.com', Icons.email_outlined,
-              textColor: textColor, cardColor: cardColor, accentColor: accentColor,
+              'Email',
+              'hasaan@example.com',
+              Icons.email_outlined,
+              textColor: textColor,
+              cardColor: cardColor,
+              accentColor: accentColor,
             ),
             const SizedBox(height: 24),
 
@@ -158,7 +172,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       obscureText: true,
                       fillColor: bgColor,
                       borderColor: bgColor,
-                      textColor: textColor, cardColor: cardColor, accentColor: accentColor,
+                      textColor: textColor,
+                      cardColor: cardColor,
+                      accentColor: accentColor,
                     ),
                     const SizedBox(height: 12),
                     _buildEditField(
@@ -169,7 +185,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       obscureText: true,
                       fillColor: bgColor,
                       borderColor: bgColor,
-                      textColor: textColor, cardColor: cardColor, accentColor: accentColor,
+                      textColor: textColor,
+                      cardColor: cardColor,
+                      accentColor: accentColor,
                     ),
                     const SizedBox(height: 8),
                     Align(
@@ -247,10 +265,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           fontFamily: 'Raleway',
           color: textColor.withValues(alpha: 0.5),
         ),
-        labelStyle: TextStyle(
-          fontFamily: 'Raleway',
-          color: textColor,
-        ),
+        labelStyle: TextStyle(fontFamily: 'Raleway', color: textColor),
         prefixIcon: Icon(icon, color: textColor.withValues(alpha: 0.8)),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
