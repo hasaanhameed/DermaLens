@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../notifiers/password_notifier.dart';
 import '../theme/app_colors.dart';
 import 'terms_page.dart';
+import '../services/auth_service.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -13,10 +14,21 @@ class SignupPage extends StatefulWidget {
 class _SignupPageState extends State<SignupPage> {
   final _passwordNotifier = PasswordNotifier();
   bool _agreedToTerms = false;
+  
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+  final AuthService _authService = AuthService();
+  bool _isLoading = false;
 
   @override
   void dispose() {
     _passwordNotifier.dispose();
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -58,6 +70,7 @@ class _SignupPageState extends State<SignupPage> {
                     const SizedBox(height: 24),
 
                     TextField(
+                      controller: _nameController,
                       style: const TextStyle(
                         fontFamily: 'Raleway',
                         color: AppColors.blush,
@@ -88,6 +101,7 @@ class _SignupPageState extends State<SignupPage> {
                     const SizedBox(height: 12),
 
                     TextField(
+                      controller: _emailController,
                       style: const TextStyle(
                         fontFamily: 'Raleway',
                         color: AppColors.blush,
@@ -121,6 +135,7 @@ class _SignupPageState extends State<SignupPage> {
                       listenable: _passwordNotifier,
                       builder: (context, _) {
                         return TextField(
+                          controller: _passwordController,
                           obscureText: _passwordNotifier.hidePassword,
                           style: const TextStyle(
                             fontFamily: 'Raleway',
@@ -166,6 +181,7 @@ class _SignupPageState extends State<SignupPage> {
                       listenable: _passwordNotifier,
                       builder: (context, _) {
                         return TextField(
+                          controller: _confirmPasswordController,
                           obscureText: _passwordNotifier.hideConfirmPassword,
                           style: const TextStyle(
                             fontFamily: 'Raleway',
@@ -257,7 +273,7 @@ class _SignupPageState extends State<SignupPage> {
                       width: double.infinity,
                       height: 54,
                       child: ElevatedButton(
-                        onPressed: () {
+                        onPressed: _isLoading ? null : () async {
                           if (!_agreedToTerms) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
@@ -274,20 +290,58 @@ class _SignupPageState extends State<SignupPage> {
                             );
                             return;
                           }
-                          Navigator.popUntil(context, (route) => route.isFirst);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: const Text(
-                                'Account successfully created',
-                                style: TextStyle(
-                                  fontFamily: 'Raleway',
-                                  color: AppColors.elevated,
-                                ),
+
+                          if (_passwordController.text != _confirmPasswordController.text) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Passwords do not match'),
+                                backgroundColor: Colors.red,
                               ),
-                              backgroundColor: AppColors.sand,
-                              duration: const Duration(seconds: 3),
-                            ),
-                          );
+                            );
+                            return;
+                          }
+
+                          setState(() => _isLoading = true);
+
+                          try {
+                            await _authService.registerUser(
+                              _nameController.text,
+                              _emailController.text,
+                              _passwordController.text,
+                            );
+
+                            if (mounted) {
+                              Navigator.popUntil(context, (route) => route.isFirst);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Account successfully created',
+                                    style: TextStyle(
+                                      fontFamily: 'Raleway',
+                                      color: AppColors.elevated,
+                                    ),
+                                  ),
+                                  backgroundColor: AppColors.sand,
+                                  duration: Duration(seconds: 3),
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    e.toString().replaceAll('Exception: ', ''),
+                                  ),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          } finally {
+                            if (mounted) {
+                              setState(() => _isLoading = false);
+                            }
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.warmGold,
@@ -297,14 +351,20 @@ class _SignupPageState extends State<SignupPage> {
                             borderRadius: BorderRadius.circular(14),
                           ),
                         ),
-                        child: const Text(
-                          'Create Account',
-                          style: TextStyle(
-                            fontFamily: 'Raleway',
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                        child: _isLoading 
+                            ? const SizedBox(
+                                height: 24, 
+                                width: 24, 
+                                child: CircularProgressIndicator(color: AppColors.deepVoid, strokeWidth: 3,)
+                              )
+                            : const Text(
+                                'Create Account',
+                                style: TextStyle(
+                                  fontFamily: 'Raleway',
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                       ),
                     ),
                   ],
