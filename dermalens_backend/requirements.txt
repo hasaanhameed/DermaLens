@@ -1,4 +1,5 @@
 fastapi
 uvicorn
-load_dotenv
 supabase
+pydantic
+python-dotenv

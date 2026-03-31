@@ -1,0 +1,15 @@
+services:
+  backend:
+    build:
+      context: ./dermalens_backend
+      dockerfile: Dockerfile
+    container_name: dermalens_backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./dermalens_backend/.env
+    restart: unless-stopped
+    volumes:
+      # Optional: Mount your source code for hot-reloading in development
+      # Don't use this volume binding in production
+      - ./dermalens_backend:/app
