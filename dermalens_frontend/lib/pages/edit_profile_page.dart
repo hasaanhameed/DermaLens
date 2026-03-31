@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
+import '../notifiers/theme_notifier.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -13,32 +14,81 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    // 1. Grab Current Theme Variables!
+    final theme = Theme.of(context);
+    final bgColor = theme.scaffoldBackgroundColor;
+    final cardColor = theme.cardColor;
+    final textColor = theme.colorScheme.onSurface;
+    final accentColor = theme.colorScheme.primary;
+
     return Scaffold(
-      backgroundColor: AppColors.surface,
+      backgroundColor: bgColor,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Edit Profile',
           style: TextStyle(
             fontFamily: 'Raleway',
             fontSize: 20,
-            color: AppColors.sand,
+            color: textColor,
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: AppColors.surface,
-        iconTheme: const IconThemeData(color: AppColors.sand),
+        backgroundColor: bgColor,
+        iconTheme: IconThemeData(color: textColor),
         elevation: 0,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
-            _buildEditField('Name', 'Hasaan', Icons.person_outline),
+            // Theme Switcher for Edit Page too
+            Container(
+              margin: const EdgeInsets.only(bottom: 24),
+              decoration: BoxDecoration(
+                color: cardColor,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: accentColor.withValues(alpha: 0.1),
+                  width: 1,
+                ),
+              ),
+              child: ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                leading: Icon(
+                  ThemeNotifier().isLightMode ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+                  color: textColor,
+                ),
+                title: Text(
+                  ThemeNotifier().isLightMode ? 'Light Mode' : 'Dark Mode',
+                  style: TextStyle(
+                    fontFamily: 'Raleway',
+                    fontSize: 16,
+                    color: textColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                trailing: Switch(
+                  value: !ThemeNotifier().isLightMode,
+                  onChanged: (val) {
+                    ThemeNotifier().toggleTheme();
+                  },
+                  activeColor: accentColor,
+                  activeTrackColor: accentColor.withValues(alpha: 0.3),
+                  inactiveThumbColor: textColor,
+                  inactiveTrackColor: cardColor,
+                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              ),
+            ),
+
+            _buildEditField(
+              'Name', 'Hasaan', Icons.person_outline, 
+              textColor: textColor, cardColor: cardColor, accentColor: accentColor,
+            ),
             const SizedBox(height: 16),
             _buildEditField(
-              'Email',
-              'hasaan@example.com',
-              Icons.email_outlined,
+              'Email', 'hasaan@example.com', Icons.email_outlined,
+              textColor: textColor, cardColor: cardColor, accentColor: accentColor,
             ),
             const SizedBox(height: 24),
 
@@ -47,25 +97,25 @@ class _EditProfilePageState extends State<EditProfilePage> {
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.elevated,
+                color: cardColor,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: AppColors.warmGold.withValues(alpha: 0.1),
+                  color: accentColor.withValues(alpha: 0.1),
                   width: 1,
                 ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Icon(Icons.shield_outlined, color: AppColors.warmGold),
-                      SizedBox(width: 12),
+                      Icon(Icons.shield_outlined, color: accentColor),
+                      const SizedBox(width: 12),
                       Text(
                         'Security',
                         style: TextStyle(
                           fontFamily: 'Raleway',
-                          color: AppColors.warmGold,
+                          color: accentColor,
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
@@ -84,17 +134,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           });
                         },
                         style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: AppColors.warmGold),
+                          side: BorderSide(color: accentColor),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                           padding: const EdgeInsets.symmetric(vertical: 14),
                         ),
-                        child: const Text(
+                        child: Text(
                           'Change Password',
                           style: TextStyle(
                             fontFamily: 'Raleway',
-                            color: AppColors.warmGold,
+                            color: accentColor,
                           ),
                         ),
                       ),
@@ -104,18 +154,22 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       'Current Password',
                       '********',
                       Icons.lock_outline,
+                      labelPrefix: 'Enter ', // Fixing specific text
                       obscureText: true,
-                      fillColor: AppColors.surface,
-                      borderColor: AppColors.surface,
+                      fillColor: bgColor,
+                      borderColor: bgColor,
+                      textColor: textColor, cardColor: cardColor, accentColor: accentColor,
                     ),
                     const SizedBox(height: 12),
                     _buildEditField(
                       'New Password',
                       '********',
                       Icons.lock_reset_outlined,
+                      labelPrefix: 'Enter ', // Fixing specific text
                       obscureText: true,
-                      fillColor: AppColors.surface,
-                      borderColor: AppColors.surface,
+                      fillColor: bgColor,
+                      borderColor: bgColor,
+                      textColor: textColor, cardColor: cardColor, accentColor: accentColor,
                     ),
                     const SizedBox(height: 8),
                     Align(
@@ -126,11 +180,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             _showPasswordFields = false;
                           });
                         },
-                        child: const Text(
+                        child: Text(
                           'Cancel',
                           style: TextStyle(
                             fontFamily: 'Raleway',
-                            color: AppColors.sand,
+                            color: textColor,
                           ),
                         ),
                       ),
@@ -149,16 +203,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.warmGold,
+                  backgroundColor: accentColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
                 ),
-                child: const Text(
+                child: Text(
                   'Save Changes',
                   style: TextStyle(
                     fontFamily: 'Raleway',
-                    color: AppColors.surface,
+                    color: bgColor,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -175,35 +229,39 @@ class _EditProfilePageState extends State<EditProfilePage> {
     String label,
     String placeholder,
     IconData icon, {
+    String labelPrefix = 'Edit ',
     bool obscureText = false,
-    Color fillColor = AppColors.elevated,
-    Color borderColor = AppColors.elevated,
+    Color? fillColor,
+    Color? borderColor,
+    required Color textColor,
+    required Color cardColor,
+    required Color accentColor,
   }) {
     return TextField(
       obscureText: obscureText,
-      style: const TextStyle(fontFamily: 'Raleway', color: AppColors.blush),
+      style: TextStyle(fontFamily: 'Raleway', color: textColor),
       decoration: InputDecoration(
-        labelText: 'Edit $label',
+        labelText: '$labelPrefix$label',
         hintText: placeholder,
         hintStyle: TextStyle(
           fontFamily: 'Raleway',
-          color: AppColors.sand.withValues(alpha: 0.5),
+          color: textColor.withValues(alpha: 0.5),
         ),
-        labelStyle: const TextStyle(
+        labelStyle: TextStyle(
           fontFamily: 'Raleway',
-          color: AppColors.sand,
+          color: textColor,
         ),
-        prefixIcon: Icon(icon, color: AppColors.sand),
+        prefixIcon: Icon(icon, color: textColor.withValues(alpha: 0.8)),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: borderColor),
+          borderSide: BorderSide(color: borderColor ?? cardColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.warmGold),
+          borderSide: BorderSide(color: accentColor),
         ),
         filled: true,
-        fillColor: fillColor,
+        fillColor: fillColor ?? cardColor,
       ),
     );
   }
