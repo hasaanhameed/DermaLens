@@ -30,4 +30,25 @@ class ScanService {
       throw Exception(error['detail'] ?? 'Scan analysis failed.');
     }
   }
+    Future<List<dynamic>> getScanHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access_token') ?? '';
+
+    final url = Uri.parse('${ApiConstants.baseUrl}/scans');
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      final error = jsonDecode(response.body);
+      throw Exception(error['detail'] ?? 'Failed to fetch history.');
+    }
+  }
+
 }

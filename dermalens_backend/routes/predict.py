@@ -74,3 +74,20 @@ async def analyze_scan(
         ai_recommendation=recommendation,
         created_at=datetime.now(timezone.utc)
     )
+
+
+@router.get("", response_model=list[ScanResponse])
+async def get_scans(current_user: UserResponse = Depends(get_current_user)):
+    try:
+        # Fetch all scans for the logged-in user, newest first
+        response = supabase.table("scans") \
+            .select("*") \
+            .eq("user_id", current_user.id) \
+            .order("created_at", desc=True) \
+            .execute()
+        return response.data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch history: {str(e)}")
+
+
+
