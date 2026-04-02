@@ -1,5 +1,4 @@
 class ApiConstants {
-  // Configured to point to your physical desktop's Wi-Fi IP address 
-  // so your physical phone can connect to the Python backend!
-  static const String baseUrl = 'http://192.168.18.60:8000';
+  // Updated for your phone to connect to your desktop's current IP
+static const String baseUrl = 'http://192.168.4.24:8000';
 }

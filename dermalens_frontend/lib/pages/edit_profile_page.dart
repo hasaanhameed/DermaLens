@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../notifiers/theme_notifier.dart';
+import '../services/auth_service.dart'; // <--- Added this
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -9,11 +10,74 @@ class EditProfilePage extends StatefulWidget {
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
+  final AuthService _authService = AuthService();
+  
+  // 1. Added Controllers to capture what you type!
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _newPasswordController = TextEditingController();
+  
   bool _showPasswordFields = false;
+  bool _isSaving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadInitialData();
+  }
+
+  // 2. Fetch the current data so the boxes aren't empty when you open the page
+  Future<void> _loadInitialData() async {
+    try {
+      final data = await _authService.getUserProfile();
+      setState(() {
+        _nameController.text = data['name'] ?? '';
+        _emailController.text = data['email'] ?? '';
+      });
+    } catch (e) {
+      debugPrint("Error loading profile data: $e");
+    }
+  }
+
+  // 3. The "Brain" of the Save Button
+    Future<void> _saveChanges() async {
+    setState(() => _isSaving = true);
+    try {
+      // 1. Update Name & Email
+      await _authService.updateProfile(
+        _nameController.text.trim(),
+        _emailController.text.trim(),
+      );
+
+      // 2. If you typed a new password, save that too
+      if (_showPasswordFields && _newPasswordController.text.isNotEmpty) {
+        await _authService.updatePassword(_newPasswordController.text);
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Profile updated successfully!')),
+        );
+        Navigator.pop(context); 
+      }
+    } catch (e) {
+      if (mounted) {
+        // IMPROVED: This will now show the EXACT reason (e.g., "Email already exists" or "Invalid format")
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString().replaceAll('Exception: ', '')),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
-    // 1. Grab Current Theme Variables!
     final theme = Theme.of(context);
     final bgColor = theme.scaffoldBackgroundColor;
     final cardColor = theme.cardColor;
@@ -40,26 +104,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
         padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
-            // Theme Switcher for Edit Page too
-            Container(
+            // Theme Switcher (Keeping your exactly as it was)
+             Container(
               margin: const EdgeInsets.only(bottom: 24),
               decoration: BoxDecoration(
                 color: cardColor,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: accentColor.withValues(alpha: 0.1),
+                  color: accentColor.withOpacity(0.1),
                   width: 1,
                 ),
               ),
               child: ListTile(
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 4,
-                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
                 leading: Icon(
-                  ThemeNotifier().isLightMode
-                      ? Icons.light_mode_outlined
-                      : Icons.dark_mode_outlined,
+                  ThemeNotifier().isLightMode ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
                   color: textColor,
                 ),
                 title: Text(
@@ -73,32 +132,31 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
                 trailing: Switch(
                   value: !ThemeNotifier().isLightMode,
-                  onChanged: (val) {
-                    ThemeNotifier().toggleTheme();
-                  },
+                  onChanged: (val) => ThemeNotifier().toggleTheme(),
                   activeColor: accentColor,
-                  activeTrackColor: accentColor.withValues(alpha: 0.3),
+                  activeTrackColor: accentColor.withOpacity(0.3),
                   inactiveThumbColor: textColor,
                   inactiveTrackColor: cardColor,
                 ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),
             ),
 
+            // Name Field
             _buildEditField(
               'Name',
-              'Hasaan',
+              _nameController, // <--- Using the controller
               Icons.person_outline,
               textColor: textColor,
               cardColor: cardColor,
               accentColor: accentColor,
             ),
             const SizedBox(height: 16),
+
+            // Email Field
             _buildEditField(
               'Email',
-              'hasaan@example.com',
+              _emailController, // <--- Using the controller
               Icons.email_outlined,
               textColor: textColor,
               cardColor: cardColor,
@@ -106,7 +164,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             ),
             const SizedBox(height: 24),
 
-            // Password Section
+            // Password Section (Linked to AuthService)
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
@@ -114,7 +172,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 color: cardColor,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: accentColor.withValues(alpha: 0.1),
+                  color: accentColor.withOpacity(0.1),
                   width: 1,
                 ),
               ),
@@ -142,46 +200,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     SizedBox(
                       width: double.infinity,
                       child: OutlinedButton(
-                        onPressed: () {
-                          setState(() {
-                            _showPasswordFields = true;
-                          });
-                        },
+                        onPressed: () => setState(() => _showPasswordFields = true),
                         style: OutlinedButton.styleFrom(
                           side: BorderSide(color: accentColor),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           padding: const EdgeInsets.symmetric(vertical: 14),
                         ),
-                        child: Text(
-                          'Change Password',
-                          style: TextStyle(
-                            fontFamily: 'Raleway',
-                            color: accentColor,
-                          ),
-                        ),
+                        child: Text('Change Password', style: TextStyle(fontFamily: 'Raleway', color: accentColor)),
                       ),
                     )
                   else ...[
                     _buildEditField(
-                      'Current Password',
-                      '********',
-                      Icons.lock_outline,
-                      labelPrefix: 'Enter ', // Fixing specific text
-                      obscureText: true,
-                      fillColor: bgColor,
-                      borderColor: bgColor,
-                      textColor: textColor,
-                      cardColor: cardColor,
-                      accentColor: accentColor,
-                    ),
-                    const SizedBox(height: 12),
-                    _buildEditField(
                       'New Password',
-                      '********',
+                      _newPasswordController, // <--- Only need new password for this flow
                       Icons.lock_reset_outlined,
-                      labelPrefix: 'Enter ', // Fixing specific text
+                      labelPrefix: 'Enter ',
                       obscureText: true,
                       fillColor: bgColor,
                       borderColor: bgColor,
@@ -193,18 +226,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
-                        onPressed: () {
-                          setState(() {
-                            _showPasswordFields = false;
-                          });
-                        },
-                        child: Text(
-                          'Cancel',
-                          style: TextStyle(
-                            fontFamily: 'Raleway',
-                            color: textColor,
-                          ),
-                        ),
+                        onPressed: () => setState(() => _showPasswordFields = false),
+                        child: Text('Cancel', style: TextStyle(fontFamily: 'Raleway', color: textColor)),
                       ),
                     ),
                   ],
@@ -213,28 +236,28 @@ class _EditProfilePageState extends State<EditProfilePage> {
             ),
 
             const SizedBox(height: 32),
+
+            // Save Button
             SizedBox(
               width: double.infinity,
               height: 54,
               child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
+                onPressed: _isSaving ? null : _saveChanges,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: accentColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 ),
-                child: Text(
-                  'Save Changes',
-                  style: TextStyle(
-                    fontFamily: 'Raleway',
-                    color: bgColor,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                child: _isSaving 
+                  ? CircularProgressIndicator(color: bgColor)
+                  : Text(
+                      'Save Changes',
+                      style: TextStyle(
+                        fontFamily: 'Raleway',
+                        color: bgColor,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
               ),
             ),
           ],
@@ -243,9 +266,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
+  // Refactored helper to use Controllers!
   Widget _buildEditField(
     String label,
-    String placeholder,
+    TextEditingController controller,
     IconData icon, {
     String labelPrefix = 'Edit ',
     bool obscureText = false,
@@ -256,17 +280,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
     required Color accentColor,
   }) {
     return TextField(
+      controller: controller, // <--- This holds the value
       obscureText: obscureText,
       style: TextStyle(fontFamily: 'Raleway', color: textColor),
       decoration: InputDecoration(
         labelText: '$labelPrefix$label',
-        hintText: placeholder,
-        hintStyle: TextStyle(
-          fontFamily: 'Raleway',
-          color: textColor.withValues(alpha: 0.5),
-        ),
         labelStyle: TextStyle(fontFamily: 'Raleway', color: textColor),
-        prefixIcon: Icon(icon, color: textColor.withValues(alpha: 0.8)),
+        prefixIcon: Icon(icon, color: textColor.withOpacity(0.8)),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: borderColor ?? cardColor),
