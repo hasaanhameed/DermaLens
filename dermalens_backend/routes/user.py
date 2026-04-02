@@ -1,27 +1,7 @@
 from fastapi import APIRouter, HTTPException, status, Depends
-<<<<<<< HEAD
-from schemas.user import UserCreate, UserResponse
-from database.database import supabase
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-
-
-security = HTTPBearer()
-
-def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    """Extracts the JWT token from the header and verifies it with Supabase"""
-    try:
-        response = supabase.auth.get_user(credentials.credentials)
-        if not response.user:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid authentication credentials")
-        return response.user
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
-
-=======
 from schemas.user import UserCreate, UserResponse, UserLogin, TokenResponse
 from database.database import supabase
 from services.auth_service import get_current_user
->>>>>>> 048d8a3ed8ee576cdbdccd8e43d164813e6c05b5
 
 router = APIRouter(prefix="/users", tags=["Users"])
 

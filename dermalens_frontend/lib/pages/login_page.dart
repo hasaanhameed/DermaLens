@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../notifiers/password_notifier.dart';
 import '../theme/app_colors.dart';
 import '../services/auth_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -43,7 +45,11 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => _isLoading = true);
 
     try {
-      await _authService.loginUser(email, password);
+      final data = await _authService.loginUser(email, password);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('user_name', data['user']['name'] ?? 'User');
+      await prefs.setString('access_token', data['access_token']);
+
       
       if (mounted) {
         Navigator.pushReplacement(

@@ -1,22 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'history_details_page.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // 1. Grab the current theme (which magically updates when the toggle is flipped!)
-    final theme = Theme.of(context);
+  State<HomePage> createState() => _HomePageState();
+}
 
+class _HomePageState extends State<HomePage> {
+  String _userName = "...";
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserName();
+  }
+
+  Future<void> _loadUserName() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _userName = prefs.getString('user_name') ?? "Guest";
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+        final theme = Theme.of(context);
     final bgColor = theme.scaffoldBackgroundColor;
     final cardColor = theme.cardColor;
-    final textColor = theme
-        .colorScheme
-        .onSurface; // DeepVoid for light mode, Sand for dark mode
-    final accentColor =
-        theme.colorScheme.primary; // Mapped to gold in dark, black in light!
+    final textColor = theme.colorScheme.onSurface;
+    final accentColor = theme.colorScheme.primary;
+
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -32,7 +49,7 @@ class HomePage extends StatelessWidget {
                 children: [
                   const SizedBox(height: 20),
                   Text(
-                    'Welcome, Hasaan!',
+                    'Welcome, $_userName',
                     style: TextStyle(
                       fontFamily: 'Raleway',
                       fontSize: 30,
