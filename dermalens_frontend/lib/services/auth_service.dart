@@ -32,4 +32,33 @@ class AuthService {
       throw Exception('Failed to connect to the server. Is it running?');
     }
   }
+
+  Future<Map<String, dynamic>> loginUser(String email, String password) async {
+    final url = Uri.parse('${ApiConstants.baseUrl}/users/login');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'email': email.trim(),
+          'password': password,
+        }),
+      );
+
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
+
+      if (response.statusCode != 200) {
+        final errorMessage = responseData['detail'] ?? 'Login failed.';
+        throw Exception(errorMessage);
+      }
+
+      return responseData;
+    } catch (e) {
+      if (e.toString().startsWith('Exception:')) {
+        rethrow;
+      }
+      throw Exception('Failed to connect to the server. Is it running?');
+    }
+  }
 }

@@ -2,6 +2,7 @@ import 'package:dermalens/widget_tree.dart';
 import 'package:flutter/material.dart';
 import '../notifiers/password_notifier.dart';
 import '../theme/app_colors.dart';
+import '../services/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -12,11 +13,58 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _passwordNotifier = PasswordNotifier();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final AuthService _authService = AuthService();
+  bool _isLoading = false;
 
   @override
   void dispose() {
     _passwordNotifier.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleLogin() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please fill in all fields'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      await _authService.loginUser(email, password);
+      
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const WidgetTree()),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString().replaceAll('Exception: ', '')),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   @override
@@ -59,6 +107,7 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 24),
 
                   TextField(
+                    controller: _emailController,
                     style: const TextStyle(
                       fontFamily: 'Raleway',
                       color: AppColors.blush,
@@ -88,6 +137,7 @@ class _LoginPageState extends State<LoginPage> {
                     listenable: _passwordNotifier,
                     builder: (context, _) {
                       return TextField(
+                        controller: _passwordController,
                         obscureText: _passwordNotifier.hidePassword,
                         style: const TextStyle(
                           fontFamily: 'Raleway',
@@ -133,14 +183,7 @@ class _LoginPageState extends State<LoginPage> {
                     width: double.infinity,
                     height: 54,
                     child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const WidgetTree(),
-                          ),
-                        );
-                      },
+                      onPressed: _isLoading ? null : _handleLogin,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.warmGold,
                         foregroundColor: AppColors.deepVoid,
@@ -149,14 +192,23 @@ class _LoginPageState extends State<LoginPage> {
                           borderRadius: BorderRadius.circular(14),
                         ),
                       ),
-                      child: const Text(
-                        'Continue',
-                        style: TextStyle(
-                          fontFamily: 'Raleway',
-                          fontSize: 17,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      child: _isLoading
+                          ? const SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: CircularProgressIndicator(
+                                color: AppColors.deepVoid,
+                                strokeWidth: 3,
+                              ),
+                            )
+                          : const Text(
+                              'Continue',
+                              style: TextStyle(
+                                fontFamily: 'Raleway',
+                                fontSize: 17,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                     ),
                   ),
                 ],

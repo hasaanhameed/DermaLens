@@ -6,12 +6,8 @@ from schemas.user import UserResponse
 security = HTTPBearer()
 
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> UserResponse:
-    """
-    Dependency to get the current authenticated user from a Supabase JWT.
-    """
     token = credentials.credentials
     try:
-        # Verify the token with Supabase
         response = supabase.auth.get_user(token)
         
         if not response.user:
