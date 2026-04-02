@@ -24,3 +24,12 @@ class TokenResponse(BaseModel):
     access_token: str
     token_type: str
     user: UserResponse
+
+
+class UserUpdate(BaseModel):
+    name: str | None = None
+    email: str | None = None
+
+
+class PasswordUpdate(BaseModel):
+    password: str
