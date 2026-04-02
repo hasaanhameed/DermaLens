@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routes import user
+from routes import user, predict
+
 
 app = FastAPI(title="DermaLens API")
 
@@ -21,3 +22,4 @@ def health_check():
 
 # Register routes
 app.include_router(user.router)
+app.include_router(predict.router)  

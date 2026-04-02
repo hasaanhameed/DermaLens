@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'history_details_page.dart';
+import 'dart:io';
+import '../services/scan_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,6 +14,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String _userName = "...";
+  final ScanService _scanService = ScanService();
 
   @override
   void initState() {
@@ -28,12 +31,11 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-        final theme = Theme.of(context);
+    final theme = Theme.of(context);
     final bgColor = theme.scaffoldBackgroundColor;
     final cardColor = theme.cardColor;
     final textColor = theme.colorScheme.onSurface;
     final accentColor = theme.colorScheme.primary;
-
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -49,12 +51,12 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   const SizedBox(height: 20),
                   Text(
-                    'Welcome, $_userName',
+                    'Welcome, $_userName!',
                     style: TextStyle(
                       fontFamily: 'Raleway',
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
-                      color: textColor, // <--- Dynamic text!
+                      color: textColor,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -70,11 +72,7 @@ class _HomePageState extends State<HomePage> {
               ),
 
               const SizedBox(height: 36),
-
-              // 2. PRIMARY AI TOOL
               const SizedBox(height: 16),
-
-              // 2. PRIMARY AI TOOLS (Dual Buttons)
               const SizedBox(height: 16),
 
               Row(
@@ -84,21 +82,18 @@ class _HomePageState extends State<HomePage> {
                     child: ElevatedButton(
                       onPressed: () async {
                         final ImagePicker picker = ImagePicker();
-                        // Open the camera
                         final XFile? image = await picker.pickImage(
                           source: ImageSource.camera,
                         );
 
                         if (image != null) {
-                          // 1. SHOW THE "ANALYZING" POP-UP NOTIFICATION
+                          // 1. SHOW THE "ANALYZING" POP-UP
                           showDialog(
                             context: context,
-                            barrierDismissible:
-                                false, // Prevents user from clicking outside to close
+                            barrierDismissible: false,
                             builder: (BuildContext context) {
                               return Dialog(
-                                backgroundColor:
-                                    cardColor, // Adapts to light/dark mode
+                                backgroundColor: cardColor,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20),
                                 ),
@@ -107,9 +102,7 @@ class _HomePageState extends State<HomePage> {
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      CircularProgressIndicator(
-                                        color: accentColor,
-                                      ),
+                                      CircularProgressIndicator(color: accentColor),
                                       const SizedBox(height: 24),
                                       Text(
                                         'Analyzing Image...',
@@ -137,42 +130,44 @@ class _HomePageState extends State<HomePage> {
                             },
                           );
 
-                          // 2. SIMULATE THE BACKEND PROCESSING DELAY (3 seconds)
-                          // (Later, this will actually be your HTTP request to the python server!)
-                          await Future.delayed(const Duration(seconds: 3));
+                          // 2. CALL THE REAL BACKEND
+                          try {
+                            final data = await _scanService.analyzeScan(File(image.path));
 
-                          // 3. CLOSE THE LOADING DIALOG
-                          if (context.mounted) {
-                            Navigator.pop(context);
-                          }
+                            // 3. CLOSE THE LOADING DIALOG
+                            if (context.mounted) Navigator.pop(context);
 
-                          // 4. MOCK DATA RETURNED BY FLASK/DJANGO BACKEND
-                          final newScanResult = {
-                            "date": "Just Now",
-                            "condition": "Benign Nevus",
-                            "severity": "Low Risk",
-                            "Model Prediction Accuracy": "98%",
-                            "imageUrl": image.path,
-                            "top1": "Benign Nevus (98%)",
-                            "top2": "Melanoma (1.5%)",
-                            "top3": "Basal Cell Carcinoma (0.5%)",
-                          };
+                            // 4. REAL DATA FROM BACKEND
+                            final newScanResult = <String, String>{
+                              "date": "Just Now",
+                              "condition": (data["condition"] ?? "Unknown").toString(),
+                              "severity": (data["severity"] ?? "Unknown").toString(),
+                              "imageUrl": image.path,
+                              "ai_recommendation": (data["ai_recommendation"] ?? "").toString(),
+                            };
 
-                          // 5. NAVIGATE TO RESULTS PAGE (REUSING HISTORY DETAILS!)
-                          if (context.mounted) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    HistoryDetailsPage(scanData: newScanResult),
-                              ),
-                            );
+                            // 5. NAVIGATE TO RESULTS PAGE
+                            if (context.mounted) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      HistoryDetailsPage(scanData: newScanResult),
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            if (context.mounted) {
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Analysis failed: $e')),
+                              );
+                            }
                           }
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            cardColor, // <--- Dynamic Card background!
+                        backgroundColor: cardColor,
                         padding: const EdgeInsets.symmetric(
                           vertical: 24,
                           horizontal: 16,
@@ -186,11 +181,7 @@ class _HomePageState extends State<HomePage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(
-                            Icons.camera_alt_outlined,
-                            color: accentColor,
-                            size: 48,
-                          ),
+                          Icon(Icons.camera_alt_outlined, color: accentColor, size: 48),
                           const SizedBox(height: 12),
                           Text(
                             'Take Photo',
@@ -206,27 +197,25 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
 
-                  const SizedBox(width: 16), // Space between buttons
+                  const SizedBox(width: 16),
+
                   // --- BUTTON 2: GALLERY ---
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () async {
                         final ImagePicker picker = ImagePicker();
-                        // Open the gallery
                         final XFile? image = await picker.pickImage(
                           source: ImageSource.gallery,
                         );
 
                         if (image != null) {
-                          // 1. SHOW THE "ANALYZING" POP-UP NOTIFICATION
+                          // 1. SHOW THE "ANALYZING" POP-UP
                           showDialog(
                             context: context,
-                            barrierDismissible:
-                                false, // Prevents user from clicking outside to close
+                            barrierDismissible: false,
                             builder: (BuildContext context) {
                               return Dialog(
-                                backgroundColor:
-                                    cardColor, // Adapts to light/dark mode
+                                backgroundColor: cardColor,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20),
                                 ),
@@ -235,9 +224,7 @@ class _HomePageState extends State<HomePage> {
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      CircularProgressIndicator(
-                                        color: accentColor,
-                                      ),
+                                      CircularProgressIndicator(color: accentColor),
                                       const SizedBox(height: 24),
                                       Text(
                                         'Analyzing Image...',
@@ -265,42 +252,44 @@ class _HomePageState extends State<HomePage> {
                             },
                           );
 
-                          // 2. SIMULATE THE BACKEND PROCESSING DELAY (3 seconds)
-                          // (Later, this will actually be your HTTP request to the python server!)
-                          await Future.delayed(const Duration(seconds: 3));
+                          // 2. CALL THE REAL BACKEND
+                          try {
+                            final data = await _scanService.analyzeScan(File(image.path));
 
-                          // 3. CLOSE THE LOADING DIALOG
-                          if (context.mounted) {
-                            Navigator.pop(context);
-                          }
+                            // 3. CLOSE THE LOADING DIALOG
+                            if (context.mounted) Navigator.pop(context);
 
-                          // 4. MOCK DATA RETURNED BY FLASK/DJANGO BACKEND
-                          final newScanResult = {
-                            "date": "Just Now",
-                            "condition": "Benign Nevus",
-                            "severity": "Low Risk",
-                            "Model Prediction Accuracy": "98%",
-                            "imageUrl": image.path,
-                            "top1": "Benign Nevus (98%)",
-                            "top2": "Melanoma (1.5%)",
-                            "top3": "Basal Cell Carcinoma (0.5%)",
-                          };
+                            // 4. REAL DATA FROM BACKEND
+                            final newScanResult = <String, String>{
+                              "date": "Just Now",
+                              "condition": (data["condition"] ?? "Unknown").toString(),
+                              "severity": (data["severity"] ?? "Unknown").toString(),
+                              "imageUrl": image.path,
+                              "ai_recommendation": (data["ai_recommendation"] ?? "").toString(),
+                            };
 
-                          // 5. NAVIGATE TO RESULTS PAGE (REUSING HISTORY DETAILS!)
-                          if (context.mounted) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    HistoryDetailsPage(scanData: newScanResult),
-                              ),
-                            );
+                            // 5. NAVIGATE TO RESULTS PAGE
+                            if (context.mounted) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      HistoryDetailsPage(scanData: newScanResult),
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            if (context.mounted) {
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Analysis failed: $e')),
+                              );
+                            }
                           }
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            cardColor, // <--- Dynamic Card background!
+                        backgroundColor: cardColor,
                         padding: const EdgeInsets.symmetric(
                           vertical: 24,
                           horizontal: 16,
@@ -314,11 +303,7 @@ class _HomePageState extends State<HomePage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(
-                            Icons.photo_library_outlined,
-                            color: accentColor,
-                            size: 48,
-                          ),
+                          Icon(Icons.photo_library_outlined, color: accentColor, size: 48),
                           const SizedBox(height: 12),
                           Text(
                             'Upload',
@@ -347,7 +332,7 @@ class _HomePageState extends State<HomePage> {
                   border: Border.all(
                     color: textColor.withOpacity(0.2),
                     width: 1,
-                  ), // Subtle dynamic border
+                  ),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -358,7 +343,7 @@ class _HomePageState extends State<HomePage> {
                         fontFamily: 'Raleway',
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: accentColor, // Keep Gold fixed
+                        color: accentColor,
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -366,12 +351,12 @@ class _HomePageState extends State<HomePage> {
                       '1. Tap the Scan Image button above.\n'
                       '2. Take or upload a clear, well-lit photo of the affected area.\n'
                       '3. Wait while our AI model identifies the issue.\n'
-                      '4. Review your results, confidence score, and severity.',
+                      '4. Review your results and severity.',
                       style: TextStyle(
                         fontFamily: 'Raleway',
                         fontSize: 14,
                         height: 1.6,
-                        color: textColor, // Dynamic text!
+                        color: textColor,
                       ),
                     ),
                   ],
@@ -380,7 +365,7 @@ class _HomePageState extends State<HomePage> {
 
               const SizedBox(height: 36),
 
-              // 3. DAILY SKIN TIP
+              // DAILY SKIN TIP
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
