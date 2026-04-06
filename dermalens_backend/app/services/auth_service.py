@@ -1,7 +1,7 @@
 from fastapi import HTTPException, status, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from database.database import supabase
-from schemas.user import UserResponse
+from app.database.database import supabase
+from app.schemas.user import UserResponse
 
 security = HTTPBearer()
 

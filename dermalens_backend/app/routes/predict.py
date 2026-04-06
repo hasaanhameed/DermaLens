@@ -1,10 +1,10 @@
 import uuid
 import random
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, status
-from schemas.scan import ScanResponse
-from schemas.user import UserResponse
-from services.auth_service import get_current_user
-from database.database import supabase
+from app.schemas.scan import ScanResponse
+from app.schemas.user import UserResponse
+from app.services.auth_service import get_current_user
+from app.database.database import supabase
 from datetime import datetime, timezone
 
 router = APIRouter(prefix="/scans", tags=["Scans"])
