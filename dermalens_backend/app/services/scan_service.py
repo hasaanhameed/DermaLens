@@ -28,14 +28,33 @@ async def process_new_scan(user_id: str, file: UploadFile) -> ScanResponse:
         prediction = predict_image(image_bytes)
         condition = prediction["condition"]
         accuracy_score = prediction["confidence"]
+        
+        # Logging for tracking model performance
+        print(f"--- Scan Analysis Complete ---")
+        print(f"User ID: {user_id}")
+        print(f"Predicted Condition: {condition}")
+        print(f"Accuracy Score: {accuracy_score:.4f}")
+        print(f"------------------------------")
+        
     except Exception as e:
         print(f"Prediction failed: {e}")
         raise HTTPException(status_code=500, detail=f"Model inference failed: {str(e)}")
 
-    # Map severity and recommendations
-    high_risk_conditions = ["Melanoma", "Basal Cell Carcinoma"]
-    severity = "High Risk" if condition in high_risk_conditions else "Low Risk"
-    recommendation = "Urgent: Please consult a dermatologist immediately." if severity == "High Risk" else "Monitor for changes and consult a professional if concerned."
+    # Risk levels based on standard dermatological triage (High/Medium/Low)
+    CONDITION_SEVERITY = {
+        "Melanoma": "High Risk",
+        "Basal Cell Carcinoma": "Medium Risk",
+        "Eczema": "Low Risk",
+        "Atopic Dermatitis": "Low Risk",
+        "Viral Infections": "Low Risk",
+        "Fungal Infections": "Low Risk",
+        "Psoriasis & Lichen Planus": "Medium Risk",
+        "Melanocytic Nevi": "Low Risk",
+        "Benign Keratosis": "Low Risk",
+        "Seborrheic Keratoses": "Low Risk"
+    }
+
+    severity = CONDITION_SEVERITY.get(condition, "Low Risk")
 
     # 4. Save the result to the Supabase "scans" table
     scan_id = str(uuid.uuid4())
@@ -49,7 +68,6 @@ async def process_new_scan(user_id: str, file: UploadFile) -> ScanResponse:
         "top1": condition,
         "top2": "",
         "top3": "",
-        "ai_recommendation": recommendation,
     }
 
     try:
@@ -64,7 +82,6 @@ async def process_new_scan(user_id: str, file: UploadFile) -> ScanResponse:
         image_url=image_url,
         condition=condition,
         severity=severity,
-        ai_recommendation=recommendation,
         created_at=datetime.now(timezone.utc)
     )
 
