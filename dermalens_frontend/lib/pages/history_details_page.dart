@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io';
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
@@ -55,7 +56,7 @@ class HistoryDetailsPage extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
                   child: (scanData["imageUrl"] != null && scanData["imageUrl"]!.isNotEmpty)
-                      ? (scanData["imageUrl"]!.startsWith('http')
+                      ? (scanData["imageUrl"]!.startsWith('http') || kIsWeb
                           ? Image.network(
                               scanData["imageUrl"]!,
                               fit: BoxFit.cover,
@@ -130,13 +131,25 @@ class HistoryDetailsPage extends StatelessWidget {
                   // Severity Row
                   Row(
                     children: [
-                      Icon(Icons.shield_outlined, color: accentColor, size: 20),
-                      const SizedBox(width: 8),
+                      Icon(
+                        scanData["severity"] == "High Risk" 
+                            ? Icons.gpp_maybe_outlined 
+                            : (scanData["severity"] == "Medium Risk" 
+                                ? Icons.warning_amber_rounded 
+                                : Icons.check_circle_outline), 
+                        color: scanData["severity"] == "High Risk" 
+                            ? AppColors.severityHigh 
+                            : (scanData["severity"] == "Medium Risk" 
+                                ? AppColors.severityMedium 
+                                : AppColors.severityLow), 
+                        size: 22,
+                      ),
+                      const SizedBox(width: 10),
                       Text(
-                        'Severity: ',
+                        'Risk Level: ',
                         style: TextStyle(
                           fontFamily: 'Raleway',
-                          color: textColor, // <--- Dynamic
+                          color: textColor.withValues(alpha: 0.7),
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
@@ -145,7 +158,11 @@ class HistoryDetailsPage extends StatelessWidget {
                         scanData["severity"]!,
                         style: TextStyle(
                           fontFamily: 'Raleway',
-                          color: accentColor, // Keep Gold fixed
+                          color: scanData["severity"] == "High Risk" 
+                              ? AppColors.severityHigh 
+                              : (scanData["severity"] == "Medium Risk" 
+                                  ? AppColors.severityMedium 
+                                  : AppColors.severityLow),
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
@@ -162,11 +179,11 @@ class HistoryDetailsPage extends StatelessWidget {
             
             // AI Recommendation text
             Text(
-              'Diagnosis and Recommendations:',
+              'Recommendations:',
               style: TextStyle(
                 fontFamily: 'Raleway',
-                color: textColor, // <--- Dynamic
-                fontSize: 16,
+                color: textColor,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),

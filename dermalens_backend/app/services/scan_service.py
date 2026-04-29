@@ -4,6 +4,7 @@ from app.schemas.scan import ScanResponse
 from app.database.database import supabase
 from app.services.prediction_service import predict_image
 from datetime import datetime, timezone
+from app.services.recommendation_service import get_skincare_recommendations
 
 async def process_new_scan(user_id: str, file: UploadFile) -> ScanResponse:
     # 1. Read the image bytes from the upload
@@ -56,6 +57,10 @@ async def process_new_scan(user_id: str, file: UploadFile) -> ScanResponse:
 
     severity = CONDITION_SEVERITY.get(condition, "Low Risk")
 
+    # Generate AI Recommendation using LangChain
+    recommendation = get_skincare_recommendations(condition, severity)
+    print(f"AI Recommendation: {recommendation}")
+
     # 4. Save the result to the Supabase "scans" table
     scan_id = str(uuid.uuid4())
     scan_data = {
@@ -65,6 +70,7 @@ async def process_new_scan(user_id: str, file: UploadFile) -> ScanResponse:
         "condition": condition,
         "severity": severity,
         "accuracy_score": accuracy_score,
+        "ai_recommendation": recommendation,
         "top1": condition,
         "top2": "",
         "top3": "",
@@ -82,6 +88,7 @@ async def process_new_scan(user_id: str, file: UploadFile) -> ScanResponse:
         image_url=image_url,
         condition=condition,
         severity=severity,
+        ai_recommendation=recommendation,
         created_at=datetime.now(timezone.utc)
     )
 

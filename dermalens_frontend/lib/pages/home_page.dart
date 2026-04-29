@@ -113,15 +113,6 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       ),
                                       const SizedBox(height: 12),
-                                      Text(
-                                        'Running deep learning models\nPlease hold on a moment.',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          fontFamily: 'Raleway',
-                                          fontSize: 14,
-                                          color: textColor.withOpacity(0.7),
-                                        ),
-                                      ),
                                     ],
                                   ),
                                 ),
@@ -137,8 +128,11 @@ class _HomePageState extends State<HomePage> {
                             if (context.mounted) Navigator.pop(context);
 
                             // 4. REAL DATA FROM BACKEND
+                            final now = DateTime.now();
+                            final formattedDate = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+
                             final newScanResult = <String, String>{
-                              "date": "Just Now",
+                              "date": formattedDate,
                               "condition": (data["condition"] ?? "Unknown").toString(),
                               "severity": (data["severity"] ?? "Unknown").toString(),
                               "imageUrl": image.path,
@@ -259,8 +253,11 @@ class _HomePageState extends State<HomePage> {
                             if (context.mounted) Navigator.pop(context);
 
                             // 4. REAL DATA FROM BACKEND
+                            final now = DateTime.now();
+                            final formattedDate = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+
                             final newScanResult = <String, String>{
-                              "date": "Just Now",
+                              "date": formattedDate,
                               "condition": (data["condition"] ?? "Unknown").toString(),
                               "severity": (data["severity"] ?? "Unknown").toString(),
                               "imageUrl": image.path,
