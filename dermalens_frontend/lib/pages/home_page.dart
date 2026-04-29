@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'history_details_page.dart';
-import 'dart:io';
 import '../services/scan_service.dart';
 
 class HomePage extends StatefulWidget {
@@ -132,7 +131,7 @@ class _HomePageState extends State<HomePage> {
 
                           // 2. CALL THE REAL BACKEND
                           try {
-                            final data = await _scanService.analyzeScan(File(image.path));
+                            final data = await _scanService.analyzeScan(image);
 
                             // 3. CLOSE THE LOADING DIALOG
                             if (context.mounted) Navigator.pop(context);
@@ -254,7 +253,7 @@ class _HomePageState extends State<HomePage> {
 
                           // 2. CALL THE REAL BACKEND
                           try {
-                            final data = await _scanService.analyzeScan(File(image.path));
+                            final data = await _scanService.analyzeScan(image);
 
                             // 3. CLOSE THE LOADING DIALOG
                             if (context.mounted) Navigator.pop(context);

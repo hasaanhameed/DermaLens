@@ -1,24 +1,31 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/api_constants.dart';
 
 class ScanService {
-  Future<Map<String, dynamic>> analyzeScan(File imageFile) async {
+  Future<Map<String, dynamic>> analyzeScan(XFile imageFile) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('access_token') ?? '';
 
     final url = Uri.parse('${ApiConstants.baseUrl}/scans/analyze');
 
-    // Multipart request because we are sending an image file, not plain JSON
+    // Multipart request because we are sending an image file
     final request = http.MultipartRequest('POST', url);
 
     // Attach the auth token
     request.headers['Authorization'] = 'Bearer $token';
 
-    // Attach the image file
-    request.files.add(await http.MultipartFile.fromPath('file', imageFile.path));
+    // Cross-platform way to attach the image file (works on Web and Mobile)
+    final bytes = await imageFile.readAsBytes();
+    final multipartFile = http.MultipartFile.fromBytes(
+      'file',
+      bytes,
+      filename: imageFile.name,
+    );
+
+    request.files.add(multipartFile);
 
     final streamedResponse = await request.send();
     final response = await http.Response.fromStream(streamedResponse);
@@ -30,7 +37,8 @@ class ScanService {
       throw Exception(error['detail'] ?? 'Scan analysis failed.');
     }
   }
-    Future<List<dynamic>> getScanHistory() async {
+
+  Future<List<dynamic>> getScanHistory() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('access_token') ?? '';
 
@@ -50,5 +58,4 @@ class ScanService {
       throw Exception(error['detail'] ?? 'Failed to fetch history.');
     }
   }
-
 }
