@@ -1,6 +1,6 @@
 import os
 from supabase import create_client, Client
-from core.config import Settings
+from app.core.config import Settings
 
 settings = Settings()
 
