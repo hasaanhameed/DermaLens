@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dermalens/pages/welcome_page.dart';
 import '../theme/app_colors.dart';
 import '../notifiers/theme_notifier.dart';
-import '../services/auth_service.dart';
+import '../services/profile_service.dart';
 import 'edit_profile_page.dart';
 import 'terms_page.dart';
 import '../services/scan_service.dart';
@@ -16,10 +16,10 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final AuthService _authService = AuthService();
-  final ScanService _scanService = ScanService(); // <--- Paste here
+  final ProfileService _profileService = ProfileService();
+  final ScanService _scanService = ScanService();
   Map<String, dynamic>? _userData;
-  int _scanCount = 0; // <--- Paste here
+  int _scanCount = 0;
   bool _isLoading = true;
 
   @override
@@ -28,11 +28,10 @@ class _ProfilePageState extends State<ProfilePage> {
     _loadProfile();
   }
 
-  // REPLACE your old _loadProfile() with this one:
   Future<void> _loadProfile() async {
     try {
       final results = await Future.wait([
-        _authService.getUserProfile(),
+        _profileService.getUserProfile(),
         _scanService.getScanHistory(),
       ]);
 
@@ -84,7 +83,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
     if (confirm == true) {
       try {
-        await _authService.deleteAccount();
+        await _profileService.deleteAccount();
         await _handleSignOut();
       } catch (e) {
         if (mounted) {

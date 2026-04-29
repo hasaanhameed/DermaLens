@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../notifiers/theme_notifier.dart';
-import '../services/auth_service.dart'; // <--- Added this
+import '../services/profile_service.dart'; // <--- Added this
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -10,7 +10,7 @@ class EditProfilePage extends StatefulWidget {
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
-  final AuthService _authService = AuthService();
+  final ProfileService _profileService = ProfileService();
 
   // 1. Added Controllers to capture what you type!
   final TextEditingController _nameController = TextEditingController();
@@ -29,7 +29,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   // 2. Fetch the current data so the boxes aren't empty when you open the page
   Future<void> _loadInitialData() async {
     try {
-      final data = await _authService.getUserProfile();
+      final data = await _profileService.getUserProfile();
       setState(() {
         _nameController.text = data['name'] ?? '';
         _emailController.text = data['email'] ?? '';
@@ -44,14 +44,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
     setState(() => _isSaving = true);
     try {
       // 1. Update Name & Email
-      await _authService.updateProfile(
+      await _profileService.updateProfile(
         _nameController.text.trim(),
         _emailController.text.trim(),
       );
 
       // 2. If you typed a new password, save that too
       if (_showPasswordFields && _newPasswordController.text.isNotEmpty) {
-        await _authService.updatePassword(_newPasswordController.text);
+        await _profileService.updatePassword(_newPasswordController.text);
       }
 
       if (mounted) {
