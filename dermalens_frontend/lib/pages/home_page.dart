@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'history_details_page.dart';
 import '../services/scan_service.dart';
+import '../theme/app_colors.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -113,6 +114,15 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       ),
                                       const SizedBox(height: 12),
+                                      Text(
+                                        'Running deep learning models\nPlease hold on a moment.',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontFamily: 'Raleway',
+                                          fontSize: 14,
+                                          color: textColor.withOpacity(0.7),
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -160,7 +170,9 @@ class _HomePageState extends State<HomePage> {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: cardColor,
+                        backgroundColor: Theme.of(context).brightness == Brightness.light
+                            ? AppColors.sand
+                            : cardColor,
                         padding: const EdgeInsets.symmetric(
                           vertical: 24,
                           horizontal: 16,
@@ -169,7 +181,8 @@ class _HomePageState extends State<HomePage> {
                           borderRadius: BorderRadius.circular(20),
                           side: BorderSide(color: accentColor, width: 0.5),
                         ),
-                        elevation: 0,
+                        elevation: Theme.of(context).brightness == Brightness.light ? 2 : 0,
+                        shadowColor: accentColor.withOpacity(0.15),
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -358,55 +371,7 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-
-              const SizedBox(height: 36),
-
-              // DAILY SKIN TIP
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: bgColor,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: textColor.withOpacity(0.1),
-                    width: 1,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.lightbulb_outline, color: accentColor, size: 32),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Skincare Tip of the Day',
-                            style: TextStyle(
-                              fontFamily: 'Raleway',
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: textColor,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Remember to apply sunscreen even on cloudy days!',
-                            style: TextStyle(
-                              fontFamily: 'Raleway',
-                              fontSize: 13,
-                              color: textColor.withOpacity(0.8),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 36),
+              const SizedBox(height: 32),
             ],
           ),
         ),
