@@ -2,7 +2,7 @@ import uuid
 from fastapi import UploadFile, HTTPException
 from app.schemas.scan import ScanResponse
 from app.database.database import supabase
-from app.services.model_service import predict_image
+from app.services.prediction_service import predict_image
 from datetime import datetime, timezone
 
 async def process_new_scan(user_id: str, file: UploadFile) -> ScanResponse:
