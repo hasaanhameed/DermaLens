@@ -24,4 +24,4 @@ def health_check():
 app.include_router(user.router)
 app.include_router(predict.router)
 app.include_router(profile.router)
-app.include_router(chat_routes.router)
+app.include_router(chat_routes.router)

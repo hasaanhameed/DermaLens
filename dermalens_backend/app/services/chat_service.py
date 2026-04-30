@@ -33,6 +33,7 @@ def generate_chat_response(message: str, history: list, condition: str) -> str:
             ("system", (
                 "You are DermaLens AI, a helpful and professional dermatological assistant. "
                 "The user has been diagnosed with {condition}. "
+                "STRICT RULE: Use PLAIN TEXT ONLY. Do not use markdown, bolding (**), or italics. "
                 "Use the following Context to answer their questions. If the answer isn't in the context, "
                 "politely say you don't have that specific information and suggest consulting a doctor. "
                 "\n\nContext:\n{context}"
@@ -40,6 +41,7 @@ def generate_chat_response(message: str, history: list, condition: str) -> str:
             MessagesPlaceholder(variable_name="history"),
             ("user", "{message}"),
         ])
+
 
         # 4. Invoke Chain
         chain = prompt | llm | StrOutputParser()

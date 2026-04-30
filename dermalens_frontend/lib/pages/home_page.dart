@@ -115,7 +115,7 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                       const SizedBox(height: 12),
                                       Text(
-                                        'Running deep learning models\nPlease hold on a moment.',
+                                        'Identifying skin conditions...\nThis will only take a moment.',
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           fontFamily: 'Raleway',
@@ -243,7 +243,7 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                       const SizedBox(height: 12),
                                       Text(
-                                        'Running deep learning models\nPlease hold on a moment.',
+                                        'Identifying skin conditions...\nThis will only take a moment.',
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           fontFamily: 'Raleway',

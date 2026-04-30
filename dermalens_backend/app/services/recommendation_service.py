@@ -25,12 +25,14 @@ def get_skincare_recommendations(condition: str, severity: str) -> str:
             ("system", (
                 "You are an AI Dermatological Assistant. "
                 "You must provide advice ONLY based on the provided Context. "
+                "STRICT RULE: Use PLAIN TEXT ONLY. Do not use markdown, bolding (**), or quotes. "
                 "If the context doesn't contain specific info, give general safe advice. "
-                "Keep it to 3-4 concise points. Use plain text. "
+                "Keep it to 3-4 concise points. "
                 "Context: {context}"
             )),
             ("user", "The patient has {condition} with a {severity} risk level. Provide immediate skincare steps."),
         ])
+
 
         chain = prompt | llm | StrOutputParser()
 
