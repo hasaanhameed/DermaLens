@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io';
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
+import 'chat_page.dart';
+
 
 class HistoryDetailsPage extends StatelessWidget {
   final Map<String, String> scanData;
@@ -193,14 +195,53 @@ class HistoryDetailsPage extends StatelessWidget {
                   'No significant issues detected. Continue to monitor the area for any changes in color and consult a doctor in case of pain or unease.',
               style: TextStyle(
                 fontFamily: 'Raleway',
-                color: textColor.withValues(alpha: 0.8), // <--- Dynamic
+                color: textColor.withValues(alpha: 0.8),
                 fontSize: 14,
                 height: 1.5,
               ),
             ),
+
+            const SizedBox(height: 32),
+            
+            // 3. Dive Deep with AI Button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ChatPage(
+                        condition: scanData["condition"] ?? "Unknown",
+                      ),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.psychology_outlined, color: Colors.white),
+                label: const Text(
+                  'Dive Deep with AI',
+                  style: TextStyle(
+                    fontFamily: 'Raleway',
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: accentColor,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  elevation: 4,
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
           ],
         ),
       ),
     );
   }
 }
+
