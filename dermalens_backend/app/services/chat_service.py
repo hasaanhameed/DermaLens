@@ -13,8 +13,7 @@ llm = ChatGroq(
 
 def generate_chat_response(message: str, history: list, condition: str) -> str:
     """
-    Handles conversational RAG. 
-    'history' should be a list of dicts: [{"role": "user", "content": "..."}, {"role": "assistant", "content": "..."}]
+    Handles conversational RAG.
     """
     try:
         # 1. Fetch Context from RAG based on the NEW user message
@@ -51,7 +50,6 @@ def generate_chat_response(message: str, history: list, condition: str) -> str:
             "history": chat_history,
             "message": message
         })
-
         return response
 
     except Exception as e:
