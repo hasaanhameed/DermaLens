@@ -10,3 +10,4 @@ pillow
 torchvision
 langchain 
 langchain-groq
+sentence-transformers
