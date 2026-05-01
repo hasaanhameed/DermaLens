@@ -24,14 +24,16 @@ def get_skincare_recommendations(condition: str, severity: str) -> str:
         prompt = ChatPromptTemplate.from_messages([
             ("system", (
                 "You are an AI Dermatological Assistant. "
-                "You must provide advice ONLY based on the provided Context. "
+                "The user has just scanned their skin and you are providing immediate advice. "
+                "TONE: Be supportive, direct, and professional. Address the user as 'you'. "
                 "STRICT RULE: Use PLAIN TEXT ONLY. Do not use markdown, bolding (**), or quotes. "
-                "If the context doesn't contain specific info, give general safe advice. "
-                "Keep it to 3-4 concise points. "
+                "Do not use phrases like 'For a patient with...' or ' skincares steps can be taken'. "
+                "Start directly with the advice based on the provided Context. "
                 "Context: {context}"
             )),
-            ("user", "The patient has {condition} with a {severity} risk level. Provide immediate skincare steps."),
+            ("user", "My scan shows {condition} with a {severity} risk level. What should I do right now?"),
         ])
+
 
 
         chain = prompt | llm | StrOutputParser()
