@@ -47,12 +47,12 @@ class _HistoryPageState extends State<HistoryPage> {
 
   @override
   Widget build(BuildContext context) {
-    // 1. Grab Current Theme Variables! (Exactly as you had them)
     final theme = Theme.of(context);
     final bgColor = theme.scaffoldBackgroundColor;
     final cardColor = theme.cardColor;
     final textColor = theme.colorScheme.onSurface;
     final accentColor = theme.colorScheme.primary;
+    final isLight = theme.brightness == Brightness.light;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -68,7 +68,7 @@ class _HistoryPageState extends State<HistoryPage> {
               fontFamily: 'Raleway',
               fontSize: 28,
               fontWeight: FontWeight.w500,
-              color: textColor,
+              color: isLight ? AppColors.deepVoid : textColor,
             ),
           ),
         ),

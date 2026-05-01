@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/chat_service.dart';
+import '../theme/app_colors.dart';
 
 class ChatPage extends StatefulWidget {
   final String condition;
@@ -85,6 +86,7 @@ class _ChatPageState extends State<ChatPage> {
     final cardColor = theme.cardColor;
     final textColor = theme.colorScheme.onSurface;
     final accentColor = theme.colorScheme.primary;
+    final isLight = theme.brightness == Brightness.light;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -92,17 +94,27 @@ class _ChatPageState extends State<ChatPage> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Dive Deep with AI',
-              style: TextStyle(fontFamily: 'Raleway', fontWeight: FontWeight.bold, fontSize: 18),
+              style: TextStyle(
+                fontFamily: 'Raleway',
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+                color: isLight ? AppColors.deepVoid : textColor,
+              ),
             ),
             Text(
               widget.condition,
-              style: TextStyle(fontFamily: 'Raleway', fontSize: 12, color: accentColor),
+              style: TextStyle(
+                fontFamily: 'Raleway',
+                fontSize: 12,
+                color: isLight ? AppColors.deepVoid.withOpacity(0.7) : accentColor,
+              ),
             ),
           ],
         ),
-        backgroundColor: bgColor,
+        backgroundColor: isLight ? AppColors.sand : bgColor,
+        iconTheme: IconThemeData(color: isLight ? AppColors.deepVoid : textColor),
         elevation: 0,
       ),
 

@@ -7,19 +7,21 @@ class HeaderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLight = Theme.of(context).brightness == Brightness.light;
+
     return Container(
-      color: AppColors.elevated,
+      color: isLight ? AppColors.sand : AppColors.elevated,
       padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text(
+          Text(
             'DermaLens',
             style: TextStyle(
               fontFamily: 'Raleway',
               fontSize: 22,
               fontWeight: FontWeight.w400,
-              color: AppColors.sand,
+              color: isLight ? AppColors.deepVoid : AppColors.sand,
             ),
           ),
           Lottie.asset(

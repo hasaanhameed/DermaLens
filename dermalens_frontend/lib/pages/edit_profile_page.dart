@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../notifiers/theme_notifier.dart';
+import '../theme/app_colors.dart';
 import '../services/profile_service.dart'; // <--- Added this
 
 class EditProfilePage extends StatefulWidget {
@@ -82,6 +83,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     final cardColor = theme.cardColor;
     final textColor = theme.colorScheme.onSurface;
     final accentColor = theme.colorScheme.primary;
+    final isLight = theme.brightness == Brightness.light;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -95,10 +97,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: bgColor,
-        iconTheme: IconThemeData(color: textColor),
+        backgroundColor: isLight ? AppColors.sand : bgColor,
+        iconTheme: IconThemeData(color: isLight ? AppColors.deepVoid : textColor),
         elevation: 0,
       ),
+
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Column(

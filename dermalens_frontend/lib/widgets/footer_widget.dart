@@ -9,15 +9,19 @@ class FooterWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLight = Theme.of(context).brightness == Brightness.light;
+
     return ListenableBuilder(
       listenable: navigationNotifier,
       builder: (context, _) {
         return BottomNavigationBar(
           currentIndex: navigationNotifier.currentIndex,
           onTap: navigationNotifier.setIndex,
-          backgroundColor: AppColors.elevated,
-          selectedItemColor: AppColors.warmGold,
-          unselectedItemColor: AppColors.sand,
+          // Light mode: warm gold bar with dark icons
+          // Dark mode: keep existing dark surface with gold icons
+          backgroundColor: isLight ? AppColors.sand : AppColors.elevated,
+          selectedItemColor: isLight ? AppColors.deepVoid : AppColors.warmGold,
+          unselectedItemColor: isLight ? AppColors.deepVoid.withOpacity(0.5) : AppColors.sand,
           items: const [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
             BottomNavigationBarItem(

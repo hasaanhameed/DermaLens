@@ -33,13 +33,13 @@ class HistoryDetailsPage extends StatelessWidget {
             fontFamily: 'Raleway',
             fontSize: 22,
             fontWeight: FontWeight.bold,
-            color: textColor, // <--- Dynamic text
+            color: isLight ? AppColors.deepVoid : textColor,
           ),
         ),
-        backgroundColor: bgColor, // <--- Dynamic bg
+        backgroundColor: isLight ? AppColors.sand : bgColor,
         elevation: 0,
         centerTitle: false,
-        iconTheme: IconThemeData(color: textColor), // <--- Dynamic back arrow color
+        iconTheme: IconThemeData(color: isLight ? AppColors.deepVoid : textColor),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
