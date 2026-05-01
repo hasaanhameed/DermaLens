@@ -17,8 +17,8 @@ class HistoryPage extends StatelessWidget {
 
     return Consumer<HistoryNotifier>(
       builder: (context, notifier, child) {
-        // Trigger load if empty
-        if (notifier.scans.isEmpty && notifier.isLoading) {
+        // Trigger load if empty AND NOT already loading
+        if (notifier.scans.isEmpty && !notifier.isLoading) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             notifier.loadHistory(context);
           });
@@ -53,7 +53,7 @@ class HistoryPage extends StatelessWidget {
                 : notifier.scans.isEmpty
                     ? _buildEmptyState(textColor)
                     : ListView.builder(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         itemCount: notifier.scans.length,
                         itemBuilder: (context, index) {
                           final scan = notifier.scans[index];
@@ -90,6 +90,9 @@ class HistoryPage extends StatelessWidget {
     final dateStr = scan['created_at'] != null 
         ? scan['created_at'].toString().split('T')[0] 
         : 'Unknown Date';
+    
+    final prob = scan['probability'] ?? 0.0;
+    final probText = (prob * 100).toStringAsFixed(1);
 
     return GestureDetector(
       onTap: () {
@@ -148,7 +151,7 @@ class HistoryPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Probability: ${(scan['probability'] * 100).toStringAsFixed(1)}%',
+                    'Probability: $probText%',
                     style: TextStyle(
                       fontFamily: 'Raleway',
                       fontSize: 14,

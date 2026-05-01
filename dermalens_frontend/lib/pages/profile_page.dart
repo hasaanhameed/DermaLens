@@ -11,20 +11,20 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final bgColor = theme.scaffoldBackgroundColor;
-    final cardColor = theme.cardColor;
-    final textColor = theme.colorScheme.onSurface;
-    final accentColor = theme.colorScheme.primary;
-
     return Consumer<ProfileNotifier>(
       builder: (context, notifier, child) {
         // Initial load logic
-        if (notifier.userData == null && notifier.isLoading) {
+        if (notifier.userData == null && !notifier.isLoading) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-             notifier.loadProfile(context);
+            notifier.loadProfile(context);
           });
         }
+
+        final theme = Theme.of(context);
+        final bgColor = theme.scaffoldBackgroundColor;
+        final cardColor = theme.cardColor;
+        final textColor = theme.colorScheme.onSurface;
+        final accentColor = theme.colorScheme.primary;
 
         if (notifier.isLoading) {
           return Scaffold(
@@ -82,15 +82,6 @@ class ProfilePage extends StatelessWidget {
       ),
       child: Column(
         children: [
-          CircleAvatar(
-            radius: 50,
-            backgroundColor: accentColor,
-            child: Text(
-              (user?['name'] ?? 'U')[0].toUpperCase(),
-              style: const TextStyle(fontSize: 40, color: Colors.white, fontWeight: FontWeight.bold),
-            ),
-          ),
-          const SizedBox(height: 16),
           Text(
             user?['name'] ?? 'User Name',
             style: TextStyle(fontFamily: 'Raleway', fontSize: 24, fontWeight: FontWeight.bold, color: textColor),
@@ -106,7 +97,7 @@ class ProfilePage extends StatelessWidget {
 
   Widget _buildStatSection(int scanCount, Color accentColor, Color cardColor, Color textColor) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(24),
@@ -114,13 +105,8 @@ class ProfilePage extends StatelessWidget {
           BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20, offset: const Offset(0, 10)),
         ],
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildStatItem('Total Scans', scanCount.toString(), accentColor, textColor),
-          Container(width: 1, height: 40, color: textColor.withOpacity(0.1)),
-          _buildStatItem('Health Score', 'Good', Colors.green, textColor),
-        ],
+      child: Center(
+        child: _buildStatItem('Total Scans', scanCount.toString(), accentColor, textColor),
       ),
     );
   }

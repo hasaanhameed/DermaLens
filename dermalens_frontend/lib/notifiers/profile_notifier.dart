@@ -14,7 +14,7 @@ class ProfileNotifier extends ChangeNotifier {
 
   Map<String, dynamic>? userData;
   int scanCount = 0;
-  bool isLoading = true;
+  bool isLoading = false;
   bool isSaving = false;
   bool showPasswordFields = false;
 

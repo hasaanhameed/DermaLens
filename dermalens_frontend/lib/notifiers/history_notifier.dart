@@ -5,7 +5,7 @@ class HistoryNotifier extends ChangeNotifier {
   final ScanService _scanService = ScanService();
   
   List<dynamic> scans = [];
-  bool isLoading = true;
+  bool isLoading = false;
 
   Future<void> loadHistory(BuildContext context) async {
     isLoading = true;
