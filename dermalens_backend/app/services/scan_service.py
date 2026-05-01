@@ -5,6 +5,9 @@ from app.database.database import supabase
 from app.services.prediction_service import predict_image
 from datetime import datetime, timezone
 from app.services.recommendation_service import get_skincare_recommendations
+from app.services.cache_service import CacheService
+
+cache_service = CacheService()
 
 async def process_new_scan(user_id: str, file: UploadFile) -> ScanResponse:
     # 1. Read the image bytes from the upload
@@ -57,8 +60,18 @@ async def process_new_scan(user_id: str, file: UploadFile) -> ScanResponse:
 
     severity = CONDITION_SEVERITY.get(condition, "Low Risk")
 
-    # Generate AI Recommendation using LangChain
-    recommendation = get_skincare_recommendations(condition, severity)
+    # 3.5 Check cache for recommendations
+    recommendation = cache_service.get_cached_recommendation(condition)
+    
+    if recommendation:
+        print(f"Cache hit for condition: {condition}")
+    else:
+        print(f"Cache miss for condition: {condition}. Fetching from AI...")
+        # Generate AI Recommendation using LangChain
+        recommendation = get_skincare_recommendations(condition, severity)
+        # Store in cache for 7 days
+        cache_service.cache_recommendation(condition, recommendation)
+
     print(f"AI Recommendation: {recommendation}")
 
     # 4. Save the result to the Supabase "scans" table
