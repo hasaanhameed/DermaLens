@@ -104,14 +104,8 @@ class _ChatPageState extends State<ChatPage> {
         ),
         backgroundColor: bgColor,
         elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.exit_to_app_rounded),
-            onPressed: () => Navigator.pop(context),
-            tooltip: 'Exit Chat',
-          ),
-        ],
       ),
+
       body: Column(
         children: [
           Expanded(
