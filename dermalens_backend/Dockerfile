@@ -4,17 +4,13 @@ FROM python:3.10-slim as builder
 # Set build directory
 WORKDIR /build
 
-# Install build dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
-
 # Copy requirements
 COPY requirements.txt .
 
 # Install dependencies into a local directory
-# We use --user to install into /root/.local
-RUN pip install --no-cache-dir --user -r requirements.txt
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir --user --default-timeout=100 --retries=10 \
+    -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu
 
 
 # Stage 2: Final stage
