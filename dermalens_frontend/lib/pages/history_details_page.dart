@@ -20,6 +20,7 @@ class HistoryDetailsPage extends StatelessWidget {
     final cardColor = theme.cardColor;
     final textColor = theme.colorScheme.onSurface;
         final accentColor = theme.colorScheme.primary; // Mapped to gold in dark, black in light!
+    final isLight = theme.brightness == Brightness.light;
 
 
 
@@ -140,10 +141,10 @@ class HistoryDetailsPage extends StatelessWidget {
                                 ? Icons.warning_amber_rounded 
                                 : Icons.check_circle_outline), 
                         color: scanData["severity"] == "High Risk" 
-                            ? AppColors.severityHigh 
+                            ? (isLight ? AppColors.elevated : AppColors.severityHigh)
                             : (scanData["severity"] == "Medium Risk" 
-                                ? AppColors.severityMedium 
-                                : AppColors.severityLow), 
+                                ? (isLight ? AppColors.elevated : AppColors.severityMedium)
+                                : (isLight ? AppColors.elevated : AppColors.severityLow)), 
                         size: 22,
                       ),
                       const SizedBox(width: 10),
@@ -161,10 +162,10 @@ class HistoryDetailsPage extends StatelessWidget {
                         style: TextStyle(
                           fontFamily: 'Raleway',
                           color: scanData["severity"] == "High Risk" 
-                              ? AppColors.severityHigh 
+                              ? (isLight ? AppColors.elevated : AppColors.severityHigh)
                               : (scanData["severity"] == "Medium Risk" 
-                                  ? AppColors.severityMedium 
-                                  : AppColors.severityLow),
+                                  ? (isLight ? AppColors.elevated : AppColors.severityMedium)
+                                  : (isLight ? AppColors.elevated : AppColors.severityLow)),
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
@@ -195,7 +196,7 @@ class HistoryDetailsPage extends StatelessWidget {
                   'No significant issues detected. Continue to monitor the area for any changes in color and consult a doctor in case of pain or unease.',
               style: TextStyle(
                 fontFamily: 'Raleway',
-                color: textColor.withValues(alpha: 0.8),
+                color: isLight ? textColor : textColor.withValues(alpha: 0.8),
                 fontSize: 14,
                 height: 1.5,
               ),

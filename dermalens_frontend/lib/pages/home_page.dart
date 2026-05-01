@@ -120,7 +120,7 @@ class _HomePageState extends State<HomePage> {
                                         style: TextStyle(
                                           fontFamily: 'Raleway',
                                           fontSize: 14,
-                                          color: textColor.withOpacity(0.7),
+                                          color: Theme.of(context).brightness == Brightness.light ? textColor : textColor.withOpacity(0.7),
                                         ),
                                       ),
                                     ],
@@ -248,7 +248,7 @@ class _HomePageState extends State<HomePage> {
                                         style: TextStyle(
                                           fontFamily: 'Raleway',
                                           fontSize: 14,
-                                          color: textColor.withOpacity(0.7),
+                                          color: Theme.of(context).brightness == Brightness.light ? textColor : textColor.withOpacity(0.7),
                                         ),
                                       ),
                                     ],

@@ -87,22 +87,25 @@ class _HistoryPageState extends State<HistoryPage> {
                 // Formatting the database date
                 final rawDate = scan["created_at"]?.toString().split('T')[0] ?? "Unknown Date";
 
-                // Determine color and icon based on severity (Your exact logic)
+                // Determine color and icon based on severity (Theme-aware for visibility)
+                final isLight = Theme.of(context).brightness == Brightness.light;
                 Color severityColor = textColor;
                 IconData severityIcon = Icons.info;
 
                 if (scan["severity"] == "Low Risk") {
-                  severityColor = AppColors.severityLow;
+                  severityColor = isLight ? AppColors.elevated : AppColors.severityLow; 
                   severityIcon = Icons.check_circle;
                 } else if (scan["severity"] == "Requires Monitor" ||
                     scan["severity"] == "Medium Risk" || 
                     scan["severity"] == "Medium") {
-                  severityColor = AppColors.severityMedium;
+                  severityColor = isLight ? AppColors.elevated : AppColors.severityMedium; 
                   severityIcon = Icons.warning_rounded;
                 } else if (scan["severity"].toString().contains("High")) {
-                  severityColor = AppColors.severityHigh;
+                  severityColor = isLight ? AppColors.elevated : AppColors.severityHigh; 
                   severityIcon = Icons.error_rounded;
                 }
+
+
 
                 return GestureDetector(
                   onTap: () {
