@@ -6,7 +6,7 @@ import 'chat_page.dart';
 
 
 class HistoryDetailsPage extends StatelessWidget {
-  final Map<String, String> scanData;
+  final Map<String, dynamic> scanData;
 
   const HistoryDetailsPage({super.key, required this.scanData});
 
@@ -14,15 +14,18 @@ class HistoryDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     // 1. Grab Current Theme Variables!
     final theme = Theme.of(context);
-        
-
     final bgColor = theme.scaffoldBackgroundColor;
     final cardColor = theme.cardColor;
     final textColor = theme.colorScheme.onSurface;
-        final accentColor = theme.colorScheme.primary; // Mapped to gold in dark, black in light!
+    final accentColor = theme.colorScheme.primary; 
     final isLight = theme.brightness == Brightness.light;
 
-
+    // Map fields from API format if necessary
+    final imageUrl = scanData["image_url"] ?? scanData["imageUrl"] ?? "";
+    final condition = scanData["condition"] ?? "Unknown Condition";
+    final date = scanData["created_at"]?.toString().split('T')[0] ?? scanData["date"] ?? "Unknown Date";
+    final probability = scanData["probability"] ?? 0.0;
+    final severity = scanData["severity"] ?? (probability > 0.7 ? "High Risk" : (probability > 0.4 ? "Medium Risk" : "Low Risk"));
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -52,32 +55,32 @@ class HistoryDetailsPage extends StatelessWidget {
                 width: 250,
                 height: 250,
                 decoration: BoxDecoration(
-                  color: cardColor, // <--- Dynamic inner box
+                  color: cardColor,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: accentColor.withValues(alpha: 0.5), width: 1),
+                  border: Border.all(color: accentColor.withOpacity(0.5), width: 1),
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
-                  child: (scanData["imageUrl"] != null && scanData["imageUrl"]!.isNotEmpty)
-                      ? (scanData["imageUrl"]!.startsWith('http') || kIsWeb
+                  child: imageUrl.isNotEmpty
+                      ? (imageUrl.startsWith('http') || kIsWeb
                           ? Image.network(
-                              scanData["imageUrl"]!,
+                              imageUrl,
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) => Icon(
                                   Icons.broken_image,
-                                  color: textColor.withValues(alpha: 0.5),
+                                  color: textColor.withOpacity(0.5),
                                   size: 64),
                             )
                           : Image.file(
-                              File(scanData["imageUrl"]!),
+                              File(imageUrl),
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) => Icon(
                                   Icons.broken_image,
-                                  color: textColor.withValues(alpha: 0.5),
+                                  color: textColor.withOpacity(0.5),
                                   size: 64),
                             ))
                       : Icon(Icons.broken_image,
-                          color: textColor.withValues(alpha: 0.5), size: 64),
+                          color: textColor.withOpacity(0.5), size: 64),
                 ),
               ),
             ),
@@ -88,9 +91,9 @@ class HistoryDetailsPage extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: cardColor, // <--- Dynamic Card
+                color: cardColor,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: textColor.withValues(alpha: 0.1), width: 1), 
+                border: Border.all(color: textColor.withOpacity(0.1), width: 1), 
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,16 +105,16 @@ class HistoryDetailsPage extends StatelessWidget {
                         'Diagnosis',
                         style: TextStyle(
                           fontFamily: 'Raleway',
-                          color: accentColor, // Gold fixed
+                          color: accentColor,
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                       Text(
-                        scanData["date"]!.toUpperCase(),
+                        date.toUpperCase(),
                         style: TextStyle(
                           fontFamily: 'Raleway',
-                          color: textColor.withValues(alpha: 0.7), // <--- Dynamic
+                          color: textColor.withOpacity(0.7),
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
@@ -120,10 +123,10 @@ class HistoryDetailsPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    scanData["condition"]!,
+                    condition,
                     style: TextStyle(
                       fontFamily: 'Raleway',
-                      color: textColor, // <--- Dynamic
+                      color: textColor,
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
                     ),
@@ -135,14 +138,14 @@ class HistoryDetailsPage extends StatelessWidget {
                   Row(
                     children: [
                       Icon(
-                        scanData["severity"] == "High Risk" 
+                        severity == "High Risk" 
                             ? Icons.gpp_maybe_outlined 
-                            : (scanData["severity"] == "Medium Risk" 
+                            : (severity == "Medium Risk" 
                                 ? Icons.warning_amber_rounded 
                                 : Icons.check_circle_outline), 
-                        color: scanData["severity"] == "High Risk" 
+                        color: severity == "High Risk" 
                             ? (isLight ? AppColors.elevated : AppColors.severityHigh)
-                            : (scanData["severity"] == "Medium Risk" 
+                            : (severity == "Medium Risk" 
                                 ? (isLight ? AppColors.elevated : AppColors.severityMedium)
                                 : (isLight ? AppColors.elevated : AppColors.severityLow)), 
                         size: 22,
@@ -152,18 +155,18 @@ class HistoryDetailsPage extends StatelessWidget {
                         'Risk Level: ',
                         style: TextStyle(
                           fontFamily: 'Raleway',
-                          color: textColor.withValues(alpha: 0.7),
+                          color: textColor.withOpacity(0.7),
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                       Text(
-                        scanData["severity"]!,
+                        severity,
                         style: TextStyle(
                           fontFamily: 'Raleway',
-                          color: scanData["severity"] == "High Risk" 
+                          color: severity == "High Risk" 
                               ? (isLight ? AppColors.elevated : AppColors.severityHigh)
-                              : (scanData["severity"] == "Medium Risk" 
+                              : (severity == "Medium Risk" 
                                   ? (isLight ? AppColors.elevated : AppColors.severityMedium)
                                   : (isLight ? AppColors.elevated : AppColors.severityLow)),
                           fontSize: 16,
@@ -172,8 +175,6 @@ class HistoryDetailsPage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  
-
                 ],
               ),
             ),
@@ -196,7 +197,7 @@ class HistoryDetailsPage extends StatelessWidget {
                   'No significant issues detected. Continue to monitor the area for any changes in color and consult a doctor in case of pain or unease.',
               style: TextStyle(
                 fontFamily: 'Raleway',
-                color: isLight ? textColor : textColor.withValues(alpha: 0.8),
+                color: isLight ? textColor : textColor.withOpacity(0.8),
                 fontSize: 14,
                 height: 1.5,
               ),
@@ -213,7 +214,7 @@ class HistoryDetailsPage extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => ChatPage(
-                        condition: scanData["condition"] ?? "Unknown",
+                        condition: condition,
                       ),
                     ),
                   );

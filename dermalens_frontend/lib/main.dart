@@ -1,10 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:dermalens/pages/welcome_page.dart';
-import 'package:dermalens/theme/app_colors.dart';
-import 'package:dermalens/notifiers/theme_notifier.dart';
+import 'package:provider/provider.dart';
+import 'notifiers/theme_notifier.dart';
+import 'notifiers/auth_notifier.dart';
+import 'notifiers/home_notifier.dart';
+import 'notifiers/chat_notifier.dart';
+import 'notifiers/profile_notifier.dart';
+import 'notifiers/history_notifier.dart';
+import 'pages/welcome_page.dart';
+import 'theme/app_colors.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthNotifier()),
+        ChangeNotifierProvider(create: (_) => HomeNotifier()),
+        ChangeNotifierProvider(create: (_) => ChatNotifier()),
+        ChangeNotifierProvider(create: (_) => ProfileNotifier()),
+        ChangeNotifierProvider(create: (_) => HistoryNotifier()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

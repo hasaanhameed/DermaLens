@@ -1,100 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:dermalens/pages/welcome_page.dart';
+import 'package:provider/provider.dart';
+import '../notifiers/profile_notifier.dart';
 import '../theme/app_colors.dart';
 import '../notifiers/theme_notifier.dart';
-import '../services/profile_service.dart';
 import 'edit_profile_page.dart';
 import 'terms_page.dart';
-import '../services/scan_service.dart';
-import '../services/pdf_service.dart';
 
-class ProfilePage extends StatefulWidget {
+class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
-
-  @override
-  State<ProfilePage> createState() => _ProfilePageState();
-}
-
-class _ProfilePageState extends State<ProfilePage> {
-  final ProfileService _profileService = ProfileService();
-  final ScanService _scanService = ScanService();
-  Map<String, dynamic>? _userData;
-  int _scanCount = 0;
-  bool _isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadProfile();
-  }
-
-  Future<void> _loadProfile() async {
-    try {
-      final results = await Future.wait([
-        _profileService.getUserProfile(),
-        _scanService.getScanHistory(),
-      ]);
-
-      setState(() {
-        _userData = results[0] as Map<String, dynamic>;
-        _scanCount = (results[1] as List).length;
-        _isLoading = false;
-      });
-    } catch (e) {
-      if (mounted) {
-        setState(() => _isLoading = false);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Failed to load profile: $e')));
-      }
-    }
-  }
-
-  Future<void> _handleSignOut() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
-    if (mounted) {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const WelcomePage()),
-        (route) => false,
-      );
-    }
-  }
-
-  Future<void> _handleDeleteAccount() async {
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Account?'),
-        content: const Text('This action is permanent and cannot be undone.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
-
-    if (confirm == true) {
-      try {
-        await _profileService.deleteAccount();
-        await _handleSignOut();
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Error deleting account: $e')));
-        }
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -104,274 +17,203 @@ class _ProfilePageState extends State<ProfilePage> {
     final textColor = theme.colorScheme.onSurface;
     final accentColor = theme.colorScheme.primary;
 
-    if (_isLoading) {
-      return Scaffold(
-        backgroundColor: bgColor,
-        body: const Center(child: CircularProgressIndicator()),
-      );
-    }
+    return Consumer<ProfileNotifier>(
+      builder: (context, notifier, child) {
+        // Initial load logic
+        if (notifier.userData == null && notifier.isLoading) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+             notifier.loadProfile(context);
+          });
+        }
 
-    return Scaffold(
-      backgroundColor: bgColor,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
-        child: Column(
-          children: [
-            Text(
-              _userData?['name'] ?? 'User',
-              style: TextStyle(
-                fontFamily: 'Raleway',
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: textColor,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              _userData?['email'] ?? 'No email found',
-              style: TextStyle(
-                fontFamily: 'Raleway',
-                fontSize: 16,
-                color: textColor.withOpacity(0.8),
-              ),
-            ),
+        if (notifier.isLoading) {
+          return Scaffold(
+            backgroundColor: bgColor,
+            body: Center(child: CircularProgressIndicator(color: accentColor)),
+          );
+        }
 
-            const SizedBox(height: 24),
+        final user = notifier.userData;
 
-            // Top Stats Card
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: cardColor,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: accentColor.withOpacity(0.3),
-                  width: 1,
-                ),
-              ),
-              child: Column(
-                children: [
-                  Text(
-                    '$_scanCount', // <--- Displays the real count
-                    style: TextStyle(
-                      fontFamily: 'Raleway',
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: accentColor,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Total Scans', // <--- Changed from 'Active Account'
-                    style: TextStyle(
-                      fontFamily: 'Raleway',
-                      fontSize: 14,
-                      color: textColor.withOpacity(0.9),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 32),
-
-            _buildSectionHeader('Preferences'),
-
-            _buildListTile(
-              context: context,
-              icon: ThemeNotifier().isLightMode
-                  ? Icons.light_mode_outlined
-                  : Icons.dark_mode_outlined,
-              title: ThemeNotifier().isLightMode ? 'Light Mode' : 'Dark Mode',
-              trailing: Switch(
-                value: !ThemeNotifier().isLightMode,
-                onChanged: (val) => ThemeNotifier().toggleTheme(),
-                activeColor: accentColor,
-                activeTrackColor: accentColor.withOpacity(0.3),
-                inactiveThumbColor: textColor,
-                inactiveTrackColor: cardColor,
-              ),
-            ),
-
-            _buildListTile(
-              context: context,
-              icon: Icons.edit_outlined,
-              title: 'Edit Profile',
-              onTap: () async {
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const EditProfilePage()),
-                );
-                _loadProfile(); // Refresh when coming back
-              },
-            ),
-
-            const SizedBox(height: 24),
-
-            _buildSectionHeader('Data & Privacy'),
-            _buildListTile(
-              context: context,
-              icon: Icons.download_outlined,
-              title: 'Export My Data',
-              onTap: () async {
-                final pdfService = PdfService();
-                
-                // Show a loading snackbar
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Generating professional report...'),
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-
-                try {
-                  await pdfService.exportScanHistory();
-                } catch (e) {
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Export failed: $e')),
-                    );
-                  }
-                }
-              },
-            ),
-            _buildListTile(
-              context: context,
-              icon: Icons.privacy_tip_outlined,
-              title: 'Privacy Policy and Terms',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const TermsPage()),
-                );
-              },
-            ),
-
-            const SizedBox(height: 32),
-
-            // Logout Button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _handleSignOut,
-                icon: Icon(Icons.logout, color: bgColor),
-                label: Text(
-                  'Sign Out',
-                  style: TextStyle(
-                    fontFamily: 'Raleway',
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: bgColor,
+        return Scaffold(
+          backgroundColor: bgColor,
+          body: SingleChildScrollView(
+            child: Column(
+              children: [
+                _buildHeader(context, user, accentColor, textColor),
+                Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    children: [
+                      _buildStatSection(notifier.scanCount, accentColor, cardColor, textColor),
+                      const SizedBox(height: 32),
+                      _buildMenuSection(context, notifier, cardColor, textColor, accentColor),
+                      const SizedBox(height: 40),
+                      Text(
+                        'DermaLens v1.0.0',
+                        style: TextStyle(
+                          fontFamily: 'Raleway',
+                          color: textColor.withOpacity(0.5),
+                          fontSize: 12,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                    ],
                   ),
                 ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: textColor,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  elevation: 0,
-                ),
-              ),
+              ],
             ),
-            const SizedBox(height: 16),
-
-            // Delete Account Button
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: _handleDeleteAccount,
-                icon: const Icon(
-                  Icons.delete_forever,
-                  color: AppColors.severityHigh,
-                ),
-                label: const Text(
-                  'Delete Account',
-                  style: TextStyle(
-                    fontFamily: 'Raleway',
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.severityHigh,
-                  ),
-                ),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  side: const BorderSide(
-                    color: AppColors.severityHigh,
-                    width: 1,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 48),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSectionHeader(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0, left: 4.0),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Text(
-          title.toUpperCase(),
-          style: const TextStyle(
-            fontFamily: 'Raleway',
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.2,
-            color: AppColors.warmGold,
           ),
+        );
+      },
+    );
+  }
+
+  Widget _buildHeader(BuildContext context, Map<String, dynamic>? user, Color accentColor, Color textColor) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.only(top: 60, bottom: 40, left: 24, right: 24),
+      decoration: BoxDecoration(
+        color: accentColor.withOpacity(0.1),
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(40),
+          bottomRight: Radius.circular(40),
         ),
+      ),
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: 50,
+            backgroundColor: accentColor,
+            child: Text(
+              (user?['name'] ?? 'U')[0].toUpperCase(),
+              style: const TextStyle(fontSize: 40, color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            user?['name'] ?? 'User Name',
+            style: TextStyle(fontFamily: 'Raleway', fontSize: 24, fontWeight: FontWeight.bold, color: textColor),
+          ),
+          Text(
+            user?['email'] ?? 'email@example.com',
+            style: TextStyle(fontFamily: 'Raleway', fontSize: 16, color: textColor.withOpacity(0.7)),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildListTile({
-    required BuildContext context,
-    required IconData icon,
-    required String title,
-    Widget? trailing,
-    VoidCallback? onTap,
-  }) {
-    final theme = Theme.of(context);
-    final cardColor = theme.cardColor;
-    final textColor = theme.colorScheme.onSurface;
-
+  Widget _buildStatSection(int scanCount, Color accentColor, Color cardColor, Color textColor) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppColors.warmGold.withOpacity(0.1),
-          width: 1,
-        ),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20, offset: const Offset(0, 10)),
+        ],
       ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-        leading: Icon(icon, color: textColor),
-        title: Text(
-          title,
-          style: TextStyle(
-            fontFamily: 'Raleway',
-            fontSize: 16,
-            color: textColor,
-            fontWeight: FontWeight.bold,
-          ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildStatItem('Total Scans', scanCount.toString(), accentColor, textColor),
+          Container(width: 1, height: 40, color: textColor.withOpacity(0.1)),
+          _buildStatItem('Health Score', 'Good', Colors.green, textColor),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatItem(String label, String value, Color valueColor, Color textColor) {
+    return Column(
+      children: [
+        Text(value, style: TextStyle(fontFamily: 'Raleway', fontSize: 22, fontWeight: FontWeight.bold, color: valueColor)),
+        Text(label, style: TextStyle(fontFamily: 'Raleway', fontSize: 12, color: textColor.withOpacity(0.5))),
+      ],
+    );
+  }
+
+  Widget _buildMenuSection(BuildContext context, ProfileNotifier notifier, Color cardColor, Color textColor, Color accentColor) {
+    return Column(
+      children: [
+        _buildMenuItem(
+          icon: Icons.person_outline,
+          title: 'Edit Profile',
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const EditProfilePage())),
+          cardColor: cardColor,
+          textColor: textColor,
         ),
-        trailing:
-            trailing ??
-            Icon(Icons.arrow_forward_ios, color: textColor, size: 16),
+        _buildMenuItem(
+          icon: Icons.description_outlined,
+          title: 'Terms & Conditions',
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const TermsPage())),
+          cardColor: cardColor,
+          textColor: textColor,
+        ),
+        _buildThemeToggle(context, cardColor, textColor, accentColor),
+        const SizedBox(height: 16),
+        _buildMenuItem(
+          icon: Icons.logout,
+          title: 'Sign Out',
+          onTap: () => notifier.signOut(context),
+          isDestructive: true,
+          cardColor: cardColor,
+          textColor: textColor,
+        ),
+        _buildMenuItem(
+          icon: Icons.delete_forever_outlined,
+          title: 'Delete Account',
+          onTap: () => notifier.deleteAccount(context),
+          isDestructive: true,
+          cardColor: cardColor,
+          textColor: textColor,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMenuItem({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+    bool isDestructive = false,
+    required Color cardColor,
+    required Color textColor,
+  }) {
+    final color = isDestructive ? Colors.redAccent : textColor;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: ListTile(
         onTap: onTap,
+        leading: Icon(icon, color: color),
+        title: Text(title, style: TextStyle(fontFamily: 'Raleway', fontWeight: FontWeight.w600, color: color)),
+        trailing: Icon(Icons.chevron_right, color: color.withOpacity(0.3)),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        tileColor: cardColor,
+      ),
+    );
+  }
+
+  Widget _buildThemeToggle(BuildContext context, Color cardColor, Color textColor, Color accentColor) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(color: cardColor, borderRadius: BorderRadius.circular(16)),
+      child: ListenableBuilder(
+        listenable: ThemeNotifier(),
+        builder: (context, child) {
+          final isLight = ThemeNotifier().isLightMode;
+          return ListTile(
+            leading: Icon(isLight ? Icons.light_mode : Icons.dark_mode, color: accentColor),
+            title: const Text('Theme Mode', style: TextStyle(fontFamily: 'Raleway', fontWeight: FontWeight.w600)),
+            subtitle: Text(isLight ? 'Light Mode' : 'Dark Mode', style: const TextStyle(fontSize: 12)),
+            trailing: Switch(
+              value: isLight,
+              onChanged: (val) => ThemeNotifier().toggleTheme(),
+              activeColor: AppColors.warmGold,
+            ),
+          );
+        },
       ),
     );
   }

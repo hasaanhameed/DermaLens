@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'history_details_page.dart';
-import '../services/scan_service.dart';
 import '../theme/app_colors.dart';
+import '../notifiers/home_notifier.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,7 +14,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String _userName = "...";
-  final ScanService _scanService = ScanService();
 
   @override
   void initState() {
@@ -33,9 +32,11 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final bgColor = theme.scaffoldBackgroundColor;
-    final cardColor = theme.cardColor;
     final textColor = theme.colorScheme.onSurface;
     final accentColor = theme.colorScheme.primary;
+
+    // 1. Grab our Notifier
+    final homeNotifier = Provider.of<HomeNotifier>(context, listen: false);
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -80,109 +81,17 @@ class _HomePageState extends State<HomePage> {
                   // --- BUTTON 1: CAMERA ---
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () async {
-                        final ImagePicker picker = ImagePicker();
-                        final XFile? image = await picker.pickImage(
-                          source: ImageSource.camera,
-                        );
-
-                        if (image != null) {
-                          // 1. SHOW THE "ANALYZING" POP-UP
-                          showDialog(
-                            context: context,
-                            barrierDismissible: false,
-                            builder: (BuildContext context) {
-                              return Dialog(
-                                backgroundColor: cardColor,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(32.0),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      CircularProgressIndicator(color: accentColor),
-                                      const SizedBox(height: 24),
-                                      Text(
-                                        'Analyzing Image...',
-                                        style: TextStyle(
-                                          fontFamily: 'Raleway',
-                                          fontSize: 20,
-                                          color: textColor,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 12),
-                                      Text(
-                                        'Identifying skin conditions...\nThis will only take a moment.',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          fontFamily: 'Raleway',
-                                          fontSize: 14,
-                                          color: Theme.of(context).brightness == Brightness.light ? textColor : textColor.withOpacity(0.7),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-
-                          // 2. CALL THE REAL BACKEND
-                          try {
-                            final data = await _scanService.analyzeScan(image);
-
-                            // 3. CLOSE THE LOADING DIALOG
-                            if (context.mounted) Navigator.pop(context);
-
-                            // 4. REAL DATA FROM BACKEND
-                            final now = DateTime.now();
-                            final formattedDate = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
-
-                            final newScanResult = <String, String>{
-                              "date": formattedDate,
-                              "condition": (data["condition"] ?? "Unknown").toString(),
-                              "severity": (data["severity"] ?? "Unknown").toString(),
-                              "imageUrl": image.path,
-                              "ai_recommendation": (data["ai_recommendation"] ?? "").toString(),
-                            };
-
-                            // 5. NAVIGATE TO RESULTS PAGE
-                            if (context.mounted) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      HistoryDetailsPage(scanData: newScanResult),
-                                ),
-                              );
-                            }
-                          } catch (e) {
-                            if (context.mounted) {
-                              Navigator.pop(context);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Analysis failed: $e')),
-                              );
-                            }
-                          }
-                        }
-                      },
+                      onPressed: () => homeNotifier.pickAndScan(context, ImageSource.camera),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).brightness == Brightness.light
-                            ? AppColors.sand
-                            : cardColor,
+                        backgroundColor: accentColor.withOpacity(0.1),
                         padding: const EdgeInsets.symmetric(
                           vertical: 24,
                           horizontal: 16,
                         ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
-                          side: BorderSide(color: accentColor, width: 0.5),
                         ),
-                        elevation: Theme.of(context).brightness == Brightness.light ? 2 : 0,
-                        shadowColor: accentColor.withOpacity(0.15),
+                        elevation: 0,
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -208,104 +117,15 @@ class _HomePageState extends State<HomePage> {
                   // --- BUTTON 2: GALLERY ---
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () async {
-                        final ImagePicker picker = ImagePicker();
-                        final XFile? image = await picker.pickImage(
-                          source: ImageSource.gallery,
-                        );
-
-                        if (image != null) {
-                          // 1. SHOW THE "ANALYZING" POP-UP
-                          showDialog(
-                            context: context,
-                            barrierDismissible: false,
-                            builder: (BuildContext context) {
-                              return Dialog(
-                                backgroundColor: cardColor,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(32.0),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      CircularProgressIndicator(color: accentColor),
-                                      const SizedBox(height: 24),
-                                      Text(
-                                        'Analyzing Image...',
-                                        style: TextStyle(
-                                          fontFamily: 'Raleway',
-                                          fontSize: 20,
-                                          color: textColor,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 12),
-                                      Text(
-                                        'Identifying skin conditions...\nThis will only take a moment.',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          fontFamily: 'Raleway',
-                                          fontSize: 14,
-                                          color: Theme.of(context).brightness == Brightness.light ? textColor : textColor.withOpacity(0.7),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-
-                          // 2. CALL THE REAL BACKEND
-                          try {
-                            final data = await _scanService.analyzeScan(image);
-
-                            // 3. CLOSE THE LOADING DIALOG
-                            if (context.mounted) Navigator.pop(context);
-
-                            // 4. REAL DATA FROM BACKEND
-                            final now = DateTime.now();
-                            final formattedDate = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
-
-                            final newScanResult = <String, String>{
-                              "date": formattedDate,
-                              "condition": (data["condition"] ?? "Unknown").toString(),
-                              "severity": (data["severity"] ?? "Unknown").toString(),
-                              "imageUrl": image.path,
-                              "ai_recommendation": (data["ai_recommendation"] ?? "").toString(),
-                            };
-
-                            // 5. NAVIGATE TO RESULTS PAGE
-                            if (context.mounted) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      HistoryDetailsPage(scanData: newScanResult),
-                                ),
-                              );
-                            }
-                          } catch (e) {
-                            if (context.mounted) {
-                              Navigator.pop(context);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Analysis failed: $e')),
-                              );
-                            }
-                          }
-                        }
-                      },
+                      onPressed: () => homeNotifier.pickAndScan(context, ImageSource.gallery),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: cardColor,
+                        backgroundColor: accentColor.withOpacity(0.1),
                         padding: const EdgeInsets.symmetric(
                           vertical: 24,
                           horizontal: 16,
                         ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
-                          side: BorderSide(color: accentColor, width: 0.5),
                         ),
                         elevation: 0,
                       ),

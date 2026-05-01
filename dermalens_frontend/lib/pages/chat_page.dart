@@ -1,83 +1,12 @@
 import 'package:flutter/material.dart';
-import '../services/chat_service.dart';
+import 'package:provider/provider.dart';
+import '../notifiers/chat_notifier.dart';
 import '../theme/app_colors.dart';
 
-class ChatPage extends StatefulWidget {
+class ChatPage extends StatelessWidget {
   final String condition;
 
   const ChatPage({super.key, required this.condition});
-
-  @override
-  State<ChatPage> createState() => _ChatPageState();
-}
-
-class _ChatPageState extends State<ChatPage> {
-  final ChatService _chatService = ChatService();
-  final TextEditingController _messageController = TextEditingController();
-  final ScrollController _scrollController = ScrollController();
-  
-  final List<Map<String, String>> _messages = [];
-  bool _isLoading = false;
-
-  @override
-  void initState() {
-    super.initState();
-    // Initial greeting from AI
-    _messages.add({
-      'role': 'assistant',
-      'content': 'Hello! I am your DermaLens assistant. I can help you understand more about ${widget.condition}. What would you like to know?'
-    });
-  }
-
-  void _scrollToBottom() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      }
-    });
-  }
-
-  Future<void> _sendMessage() async {
-    final text = _messageController.text.trim();
-    if (text.isEmpty) return;
-
-    setState(() {
-      _messages.add({'role': 'user', 'content': text});
-      _messageController.clear();
-      _isLoading = true;
-    });
-    _scrollToBottom();
-
-    try {
-      // Prepare history (excluding the current message we just added)
-      final history = _messages.sublist(0, _messages.length - 1);
-      
-      final response = await _chatService.sendChatMessage(
-        message: text,
-        condition: widget.condition,
-        history: history,
-      );
-
-      setState(() {
-        _messages.add({'role': 'assistant', 'content': response});
-        _isLoading = false;
-      });
-      _scrollToBottom();
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,59 +17,65 @@ class _ChatPageState extends State<ChatPage> {
     final accentColor = theme.colorScheme.primary;
     final isLight = theme.brightness == Brightness.light;
 
-    return Scaffold(
-      backgroundColor: bgColor,
-      appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Dive Deep with AI',
-              style: TextStyle(
-                fontFamily: 'Raleway',
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-                color: isLight ? AppColors.deepVoid : textColor,
-              ),
-            ),
-            Text(
-              widget.condition,
-              style: TextStyle(
-                fontFamily: 'Raleway',
-                fontSize: 12,
-                color: isLight ? AppColors.deepVoid.withOpacity(0.7) : accentColor,
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: isLight ? AppColors.sand : bgColor,
-        iconTheme: IconThemeData(color: isLight ? AppColors.deepVoid : textColor),
-        elevation: 0,
-      ),
+    return Consumer<ChatNotifier>(
+      builder: (context, notifier, child) {
+        // Initialize if empty
+        notifier.initChat(condition);
 
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              controller: _scrollController,
-              padding: const EdgeInsets.all(16),
-              itemCount: _messages.length + (_isLoading ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (index == _messages.length) {
-                  return _buildLoadingBubble(accentColor, cardColor);
-                }
-                final msg = _messages[index];
-                return _buildChatBubble(msg, accentColor, cardColor, textColor);
-              },
+        return Scaffold(
+          backgroundColor: bgColor,
+          appBar: AppBar(
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Dive Deep with AI',
+                  style: TextStyle(
+                    fontFamily: 'Raleway',
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    color: isLight ? AppColors.deepVoid : textColor,
+                  ),
+                ),
+                Text(
+                  condition,
+                  style: TextStyle(
+                    fontFamily: 'Raleway',
+                    fontSize: 12,
+                    color: isLight ? AppColors.deepVoid.withOpacity(0.7) : accentColor,
+                  ),
+                ),
+              ],
             ),
+            backgroundColor: isLight ? AppColors.sand : bgColor,
+            iconTheme: IconThemeData(color: isLight ? AppColors.deepVoid : textColor),
+            elevation: 0,
           ),
-          _buildInputArea(cardColor, accentColor, textColor),
-        ],
-      ),
+          body: Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  controller: notifier.scrollController,
+                  padding: const EdgeInsets.all(16),
+                  itemCount: notifier.messages.length + (notifier.isLoading ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (index == notifier.messages.length) {
+                      return _buildLoadingBubble(accentColor, cardColor);
+                    }
+                    final msg = notifier.messages[index];
+                    return _buildChatBubble(context, msg, accentColor, cardColor, textColor);
+                  },
+                ),
+              ),
+              _buildInputArea(context, notifier, cardColor, accentColor, textColor),
+            ],
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildChatBubble(Map<String, String> msg, Color accentColor, Color cardColor, Color textColor) {
+  Widget _buildChatBubble(BuildContext context, Map<String, String> msg, Color accentColor, Color cardColor, Color textColor) {
     final isUser = msg['role'] == 'user';
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
@@ -199,7 +134,7 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  Widget _buildInputArea(Color cardColor, Color accentColor, Color textColor) {
+  Widget _buildInputArea(BuildContext context, ChatNotifier notifier, Color cardColor, Color accentColor, Color textColor) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -217,7 +152,7 @@ class _ChatPageState extends State<ChatPage> {
           children: [
             Expanded(
               child: TextField(
-                controller: _messageController,
+                controller: notifier.messageController,
                 style: TextStyle(fontFamily: 'Raleway', color: textColor),
                 decoration: InputDecoration(
                   hintText: 'Ask about your condition...',
@@ -230,13 +165,13 @@ class _ChatPageState extends State<ChatPage> {
                   filled: true,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 ),
-                onSubmitted: (_) => _sendMessage(),
+                onSubmitted: (_) => notifier.sendMessage(context, condition),
               ),
             ),
             const SizedBox(width: 8),
             IconButton(
               icon: Icon(Icons.send_rounded, color: accentColor),
-              onPressed: _sendMessage,
+              onPressed: () => notifier.sendMessage(context, condition),
             ),
           ],
         ),

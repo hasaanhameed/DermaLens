@@ -1,80 +1,10 @@
 import 'package:flutter/material.dart';
-import '../notifiers/theme_notifier.dart';
+import 'package:provider/provider.dart';
+import '../notifiers/profile_notifier.dart';
 import '../theme/app_colors.dart';
-import '../services/profile_service.dart'; // <--- Added this
 
-class EditProfilePage extends StatefulWidget {
+class EditProfilePage extends StatelessWidget {
   const EditProfilePage({super.key});
-
-  @override
-  State<EditProfilePage> createState() => _EditProfilePageState();
-}
-
-class _EditProfilePageState extends State<EditProfilePage> {
-  final ProfileService _profileService = ProfileService();
-
-  // 1. Added Controllers to capture what you type!
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _newPasswordController = TextEditingController();
-
-  bool _showPasswordFields = false;
-  bool _isSaving = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadInitialData();
-  }
-
-  // 2. Fetch the current data so the boxes aren't empty when you open the page
-  Future<void> _loadInitialData() async {
-    try {
-      final data = await _profileService.getUserProfile();
-      setState(() {
-        _nameController.text = data['name'] ?? '';
-        _emailController.text = data['email'] ?? '';
-      });
-    } catch (e) {
-      debugPrint("Error loading profile data: $e");
-    }
-  }
-
-  // 3. The "Brain" of the Save Button
-  Future<void> _saveChanges() async {
-    setState(() => _isSaving = true);
-    try {
-      // 1. Update Name & Email
-      await _profileService.updateProfile(
-        _nameController.text.trim(),
-        _emailController.text.trim(),
-      );
-
-      // 2. If you typed a new password, save that too
-      if (_showPasswordFields && _newPasswordController.text.isNotEmpty) {
-        await _profileService.updatePassword(_newPasswordController.text);
-      }
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile updated successfully!')),
-        );
-        Navigator.pop(context);
-      }
-    } catch (e) {
-      if (mounted) {
-        // IMPROVED: This will now show the EXACT reason (e.g., "Email already exists" or "Invalid format")
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString().replaceAll('Exception: ', '')),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isSaving = false);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,246 +15,157 @@ class _EditProfilePageState extends State<EditProfilePage> {
     final accentColor = theme.colorScheme.primary;
     final isLight = theme.brightness == Brightness.light;
 
-    return Scaffold(
-      backgroundColor: bgColor,
-      appBar: AppBar(
-        title: Text(
-          'Edit Profile',
-          style: TextStyle(
-            fontFamily: 'Raleway',
-            fontSize: 20,
-            color: textColor,
-            fontWeight: FontWeight.bold,
+    return Consumer<ProfileNotifier>(
+      builder: (context, notifier, child) {
+        return Scaffold(
+          backgroundColor: bgColor,
+          appBar: AppBar(
+            title: Text(
+              'Edit Profile',
+              style: TextStyle(
+                fontFamily: 'Raleway',
+                fontSize: 20,
+                color: textColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            backgroundColor: isLight ? AppColors.sand : bgColor,
+            elevation: 0,
+            iconTheme: IconThemeData(color: textColor),
           ),
-        ),
-        backgroundColor: isLight ? AppColors.sand : bgColor,
-        iconTheme: IconThemeData(color: isLight ? AppColors.deepVoid : textColor),
-        elevation: 0,
-      ),
-
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          children: [
-            // Theme Switcher (Keeping your exactly as it was)
-            Container(
-              margin: const EdgeInsets.only(bottom: 24),
-              decoration: BoxDecoration(
-                color: cardColor,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: accentColor.withOpacity(0.1),
-                  width: 1,
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildSectionTitle('Personal Information', textColor),
+                const SizedBox(height: 16),
+                _buildTextField(
+                  controller: notifier.nameController,
+                  label: 'Full Name',
+                  icon: Icons.person_outline,
+                  textColor: textColor,
+                  cardColor: cardColor,
+                  accentColor: accentColor,
                 ),
-              ),
-              child: ListTile(
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 4,
+                const SizedBox(height: 16),
+                _buildTextField(
+                  controller: notifier.emailController,
+                  label: 'Email Address',
+                  icon: Icons.email_outlined,
+                  textColor: textColor,
+                  cardColor: cardColor,
+                  accentColor: accentColor,
                 ),
-                leading: Icon(
-                  ThemeNotifier().isLightMode
-                      ? Icons.light_mode_outlined
-                      : Icons.dark_mode_outlined,
-                  color: textColor,
-                ),
-                title: Text(
-                  ThemeNotifier().isLightMode ? 'Light Mode' : 'Dark Mode',
-                  style: TextStyle(
-                    fontFamily: 'Raleway',
-                    fontSize: 16,
-                    color: textColor,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                trailing: Switch(
-                  value: !ThemeNotifier().isLightMode,
-                  onChanged: (val) => ThemeNotifier().toggleTheme(),
-                  activeColor: accentColor,
-                  activeTrackColor: accentColor.withOpacity(0.3),
-                  inactiveThumbColor: textColor,
-                  inactiveTrackColor: cardColor,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-            ),
-
-            // Name Field
-            _buildEditField(
-              'Name',
-              _nameController, // <--- Using the controller
-              Icons.person_outline,
-              textColor: textColor,
-              cardColor: cardColor,
-              accentColor: accentColor,
-            ),
-            const SizedBox(height: 16),
-
-            // Email Field
-            _buildEditField(
-              'Email',
-              _emailController, // <--- Using the controller
-              Icons.email_outlined,
-              textColor: textColor,
-              cardColor: cardColor,
-              accentColor: accentColor,
-            ),
-            const SizedBox(height: 24),
-
-            // Password Section (Linked to AuthService)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: cardColor,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: accentColor.withOpacity(0.1),
-                  width: 1,
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.shield_outlined, color: accentColor),
-                      const SizedBox(width: 12),
-                      Text(
-                        'Security',
-                        style: TextStyle(
-                          fontFamily: 'Raleway',
-                          color: accentColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-
-                  if (!_showPasswordFields)
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton(
-                        onPressed: () =>
-                            setState(() => _showPasswordFields = true),
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(color: accentColor),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                        ),
-                        child: Text(
-                          'Change Password',
-                          style: TextStyle(
-                            fontFamily: 'Raleway',
-                            color: accentColor,
-                          ),
-                        ),
-                      ),
-                    )
-                  else ...[
-                    _buildEditField(
-                      'New Password',
-                      _newPasswordController, // <--- Only need new password for this flow
-                      Icons.lock_reset_outlined,
-                      labelPrefix: 'Enter ',
-                      obscureText: true,
-                      fillColor: bgColor,
-                      borderColor: bgColor,
-                      textColor: textColor,
-                      cardColor: cardColor,
-                      accentColor: accentColor,
-                    ),
-                    const SizedBox(height: 8),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () =>
-                            setState(() => _showPasswordFields = false),
-                        child: Text(
-                          'Cancel',
-                          style: TextStyle(
-                            fontFamily: 'Raleway',
-                            color: textColor,
-                          ),
-                        ),
-                      ),
+                const SizedBox(height: 32),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildSectionTitle('Security', textColor),
+                    Switch(
+                      value: notifier.showPasswordFields,
+                      onChanged: (_) => notifier.togglePasswordFields(),
+                      activeColor: accentColor,
                     ),
                   ],
+                ),
+                if (notifier.showPasswordFields) ...[
+                  const SizedBox(height: 16),
+                  _buildTextField(
+                    controller: notifier.newPasswordController,
+                    label: 'New Password',
+                    icon: Icons.lock_outline,
+                    isPassword: true,
+                    textColor: textColor,
+                    cardColor: cardColor,
+                    accentColor: accentColor,
+                  ),
                 ],
-              ),
-            ),
-
-            const SizedBox(height: 32),
-
-            // Save Button
-            SizedBox(
-              width: double.infinity,
-              height: 54,
-              child: ElevatedButton(
-                onPressed: _isSaving ? null : _saveChanges,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: accentColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+                const SizedBox(height: 40),
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: notifier.isSaving ? null : () => notifier.saveChanges(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: accentColor,
+                      foregroundColor: isLight ? Colors.white : AppColors.deepVoid,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: notifier.isSaving
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text(
+                            'Save Changes',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Raleway',
+                            ),
+                          ),
                   ),
                 ),
-                child: _isSaving
-                    ? CircularProgressIndicator(color: bgColor)
-                    : Text(
-                        'Save Changes',
-                        style: TextStyle(
-                          fontFamily: 'Raleway',
-                          color: bgColor,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-              ),
+              ],
             ),
-          ],
-        ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSectionTitle(String title, Color textColor) {
+    return Text(
+      title,
+      style: TextStyle(
+        fontFamily: 'Raleway',
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+        color: textColor,
       ),
     );
   }
 
-  // Refactored helper to use Controllers!
-  Widget _buildEditField(
-    String label,
-    TextEditingController controller,
-    IconData icon, {
-    String labelPrefix = 'Edit ',
-    bool obscureText = false,
-    Color? fillColor,
-    Color? borderColor,
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    bool isPassword = false,
     required Color textColor,
     required Color cardColor,
     required Color accentColor,
   }) {
-    return TextField(
-      controller: controller, // <--- This holds the value
-      obscureText: obscureText,
-      style: TextStyle(fontFamily: 'Raleway', color: textColor),
-      decoration: InputDecoration(
-        labelText: '$labelPrefix$label',
-        labelStyle: TextStyle(fontFamily: 'Raleway', color: textColor),
-        prefixIcon: Icon(icon, color: textColor.withOpacity(0.8)),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: borderColor ?? cardColor),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontFamily: 'Raleway',
+            fontSize: 14,
+            color: textColor.withOpacity(0.6),
+          ),
         ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: accentColor),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            color: cardColor,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: textColor.withOpacity(0.1)),
+          ),
+          child: TextField(
+            controller: controller,
+            obscureText: isPassword,
+            style: TextStyle(fontFamily: 'Raleway', color: textColor),
+            decoration: InputDecoration(
+              prefixIcon: Icon(icon, color: accentColor),
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            ),
+          ),
         ),
-        filled: true,
-        fillColor: fillColor ?? cardColor,
-      ),
+      ],
     );
   }
 }
