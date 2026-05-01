@@ -11,3 +11,4 @@ torchvision
 langchain 
 langchain-groq
 sentence-transformers
+redis
