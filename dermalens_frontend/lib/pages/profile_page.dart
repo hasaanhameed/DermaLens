@@ -7,6 +7,7 @@ import '../services/profile_service.dart';
 import 'edit_profile_page.dart';
 import 'terms_page.dart';
 import '../services/scan_service.dart';
+import '../services/pdf_service.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -213,7 +214,27 @@ class _ProfilePageState extends State<ProfilePage> {
               context: context,
               icon: Icons.download_outlined,
               title: 'Export My Data',
-              onTap: () {},
+              onTap: () async {
+                final pdfService = PdfService();
+                
+                // Show a loading snackbar
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Generating professional report...'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+
+                try {
+                  await pdfService.exportScanHistory();
+                } catch (e) {
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Export failed: $e')),
+                    );
+                  }
+                }
+              },
             ),
             _buildListTile(
               context: context,
