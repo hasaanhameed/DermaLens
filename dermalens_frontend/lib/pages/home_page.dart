@@ -359,8 +359,9 @@ class _HomePageState extends State<HomePage> {
                     Text(
                       '1. Tap the Scan Image button above.\n'
                       '2. Take or upload a clear, well-lit photo of the affected area.\n'
-                      '3. Wait while our AI model identifies the issue.\n'
-                      '4. Review your results and severity.',
+                      '3. Wait while DermaLens identifies the condition.\n'
+                      '4. Review your personalized results and severity.\n'
+                      '5. Use the Dive Deep with AI feature to ask any questions.',
                       style: TextStyle(
                         fontFamily: 'Raleway',
                         fontSize: 14,

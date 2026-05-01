@@ -17,15 +17,33 @@ class _HistoryPageState extends State<HistoryPage> {
   @override
   void initState() {
     super.initState();
-    _historyFuture = _scanService.getScanHistory();
+    _historyFuture = _loadHistoryWithImages();
+  }
+
+  Future<List<dynamic>> _loadHistoryWithImages() async {
+    final scans = await _scanService.getScanHistory();
+    
+    // Pre-cache all images in the background so they appear instantly in the list
+    if (mounted && scans.isNotEmpty) {
+      await Future.wait(scans.map((scan) {
+        if (scan["image_url"] != null) {
+          return precacheImage(NetworkImage(scan["image_url"]), context);
+        }
+        return Future.value();
+      }));
+    }
+
+    
+    return scans;
   }
 
   // Pull to refresh function
   Future<void> _refreshHistory() async {
     setState(() {
-      _historyFuture = _scanService.getScanHistory();
+      _historyFuture = _loadHistoryWithImages();
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
