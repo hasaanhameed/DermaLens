@@ -1,58 +1,20 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import '../constants/api_constants.dart';
+import 'api_base.dart';
 
-class AuthService {
+class AuthService extends ApiBase {
   Future<void> registerUser(String name, String email, String password) async {
-    final url = Uri.parse('${ApiConstants.baseUrl}/users/signup');
-
-    try {
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'name': name.trim(),
-          'email': email.trim(),
-          'password': password,
-        }),
-      );
-
-      if (response.statusCode != 201) {
-        final Map<String, dynamic> responseData = jsonDecode(response.body);
-        final errorMessage = responseData['detail'] ?? 'Registration failed.';
-        throw Exception(errorMessage);
-      }
-    } catch (e) {
-      if (e.toString().startsWith('Exception:')) {
-        rethrow;
-      }
-      throw Exception('Failed to connect to the server. Is it running?');
-    }
+    final response = await post('/users/signup', {
+      'name': name.trim(),
+      'email': email.trim(),
+      'password': password,
+    });
+    handleResponse(response);
   }
 
   Future<Map<String, dynamic>> loginUser(String email, String password) async {
-    final url = Uri.parse('${ApiConstants.baseUrl}/users/login');
-
-    try {
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email.trim(), 'password': password}),
-      );
-
-      final Map<String, dynamic> responseData = jsonDecode(response.body);
-
-      if (response.statusCode != 200) {
-        final errorMessage = responseData['detail'] ?? 'Login failed.';
-        throw Exception(errorMessage);
-      }
-
-      return responseData;
-    } catch (e) {
-      if (e.toString().startsWith('Exception:')) {
-        rethrow;
-      }
-      throw Exception('Failed to connect to the server. Is it running?');
-    }
+    final response = await post('/users/login', {
+      'email': email.trim(),
+      'password': password,
+    });
+    return handleResponse(response);
   }
 }

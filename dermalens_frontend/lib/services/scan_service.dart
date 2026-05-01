@@ -1,61 +1,30 @@
-import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../constants/api_constants.dart';
+import 'api_base.dart';
 
-class ScanService {
+class ScanService extends ApiBase {
   Future<Map<String, dynamic>> analyzeScan(XFile imageFile) async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('access_token') ?? '';
-
-    final url = Uri.parse('${ApiConstants.baseUrl}/scans/analyze');
-
-    // Multipart request because we are sending an image file
+    final url = Uri.parse('${ApiBase.baseUrl}/scans/analyze');
     final request = http.MultipartRequest('POST', url);
+    
+    // Use centralized headers
+    final headers = await getHeaders();
+    request.headers.addAll(headers);
 
-    // Attach the auth token
-    request.headers['Authorization'] = 'Bearer $token';
-
-    // Cross-platform way to attach the image file (works on Web and Mobile)
     final bytes = await imageFile.readAsBytes();
-    final multipartFile = http.MultipartFile.fromBytes(
+    request.files.add(http.MultipartFile.fromBytes(
       'file',
       bytes,
       filename: imageFile.name,
-    );
-
-    request.files.add(multipartFile);
+    ));
 
     final streamedResponse = await request.send();
     final response = await http.Response.fromStream(streamedResponse);
-
-    if (response.statusCode == 201) {
-      return jsonDecode(response.body);
-    } else {
-      final error = jsonDecode(response.body);
-      throw Exception(error['detail'] ?? 'Scan analysis failed.');
-    }
+    return handleResponse(response);
   }
 
   Future<List<dynamic>> getScanHistory() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('access_token') ?? '';
-
-    final url = Uri.parse('${ApiConstants.baseUrl}/scans');
-
-    final response = await http.get(
-      url,
-      headers: {
-        'Authorization': 'Bearer $token',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    } else {
-      final error = jsonDecode(response.body);
-      throw Exception(error['detail'] ?? 'Failed to fetch history.');
-    }
+    final response = await get('/scans');
+    return handleResponse(response);
   }
 }
