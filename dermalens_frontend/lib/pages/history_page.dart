@@ -79,8 +79,7 @@ class HistoryPage extends StatelessWidget {
         ? scan['created_at'].toString().split('T')[0] 
         : 'Unknown Date';
     
-    final prob = scan['probability'] ?? 0.0;
-    final probText = (prob * 100).toStringAsFixed(1);
+
 
     return GestureDetector(
       onTap: () {
@@ -137,15 +136,7 @@ class HistoryPage extends StatelessWidget {
                       color: isLight ? AppColors.deepVoid : textColor,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Probability: $probText%',
-                    style: TextStyle(
-                      fontFamily: 'Raleway',
-                      fontSize: 14,
-                      color: isLight ? AppColors.deepVoid.withOpacity(0.7) : textColor.withOpacity(0.7),
-                    ),
-                  ),
+
                   const SizedBox(height: 8),
                   Text(
                     dateStr,
