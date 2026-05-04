@@ -41,16 +41,16 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         )
 
         # 3. Cache the result (for 1 hour)
-        import json
         cache_service.redis.setex(
             cache_key,
             3600,
-            json.dumps(user_data.model_dump())
+            user_data.model_dump_json()
         )
         
         return user_data
             
     except Exception as e:
+        print(f"Auth error: {str(e)}")
         if isinstance(e, HTTPException):
             raise e
         raise HTTPException(

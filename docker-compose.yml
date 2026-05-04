@@ -6,10 +6,19 @@ services:
     container_name: dermalens_backend
     ports:
       - "8000:8000"
+    volumes:
+      - ./dermalens_backend:/app
     env_file:
       - ./dermalens_backend/.env
-    restart: unless-stopped
-    volumes:
-      # Optional: Mount your source code for hot-reloading in development
-      # Don't use this volume binding in production
-      - ./dermalens_backend:/app
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+    restart: always
+
+  redis:
+    image: redis:7-alpine
+    container_name: dermalens_cache
+    ports:
+      - "6379:6379"
+    restart: always

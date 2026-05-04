@@ -35,7 +35,7 @@ class ApiBase {
 
   Future<http.Response> put(String endpoint, dynamic body) async {
     final url = Uri.parse('$baseUrl$endpoint');
-    final headers = await _getHeaders();
+    final headers = await getHeaders();
     return await http.put(
       url,
       headers: headers,
@@ -45,7 +45,7 @@ class ApiBase {
 
   Future<http.Response> delete(String endpoint) async {
     final url = Uri.parse('$baseUrl$endpoint');
-    final headers = await _getHeaders();
+    final headers = await getHeaders();
     return await http.delete(url, headers: headers);
   }
 
