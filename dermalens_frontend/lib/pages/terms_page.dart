@@ -6,24 +6,29 @@ class TermsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final bgColor = theme.scaffoldBackgroundColor;
+    final textColor = theme.colorScheme.onSurface;
+    final accentColor = theme.colorScheme.primary;
+
     return Scaffold(
-      backgroundColor: AppColors.surface,
+      backgroundColor: bgColor,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Privacy Policy & Terms',
           style: TextStyle(
             fontFamily: 'Raleway',
             fontSize: 20,
-            color: AppColors.sand,
+            color: textColor,
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: AppColors.surface,
-        iconTheme: const IconThemeData(color: AppColors.sand),
+        backgroundColor: bgColor,
+        iconTheme: IconThemeData(color: textColor),
         elevation: 0,
       ),
-      body: const SingleChildScrollView(
-        padding: EdgeInsets.all(24.0),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -32,11 +37,11 @@ class TermsPage extends StatelessWidget {
               style: TextStyle(
                 fontFamily: 'Raleway',
                 fontSize: 24,
-                color: AppColors.warmGold,
+                color: accentColor,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Text(
               'By using DermaLens, you agree to the following terms:\n\n'
               '1. AI-Generated Content\n'
@@ -48,7 +53,7 @@ class TermsPage extends StatelessWidget {
               style: TextStyle(
                 fontFamily: 'Raleway',
                 fontSize: 15,
-                color: AppColors.sand,
+                color: textColor.withOpacity(0.8),
                 height: 1.5,
               ),
             ),
