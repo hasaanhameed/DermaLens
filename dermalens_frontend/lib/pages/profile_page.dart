@@ -137,6 +137,13 @@ class ProfilePage extends StatelessWidget {
           cardColor: cardColor,
           textColor: textColor,
         ),
+        _buildMenuItem(
+          icon: Icons.picture_as_pdf_outlined,
+          title: 'Export My Report',
+          onTap: () => notifier.exportReport(context),
+          cardColor: cardColor,
+          textColor: textColor,
+        ),
         _buildThemeToggle(context, cardColor, textColor, accentColor),
         const SizedBox(height: 16),
         _buildMenuItem(

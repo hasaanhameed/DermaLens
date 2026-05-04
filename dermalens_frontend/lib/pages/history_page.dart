@@ -26,40 +26,28 @@ class HistoryPage extends StatelessWidget {
 
         return Scaffold(
           backgroundColor: bgColor,
-          appBar: AppBar(
-            toolbarHeight: 90,
-            automaticallyImplyLeading: false,
-            centerTitle: true,
-            title: Padding(
-              padding: const EdgeInsets.only(top: 26.0, bottom: 10.0),
-              child: Text(
-                'Diagnostic History',
-                style: TextStyle(
-                  fontFamily: 'Raleway',
-                  fontSize: 28,
-                  fontWeight: FontWeight.w500,
-                  color: isLight ? AppColors.deepVoid : textColor,
+          body: Column(
+            children: [
+              _buildHeader(isLight, textColor, accentColor),
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: () => notifier.refreshHistory(context),
+                  color: accentColor,
+                  child: notifier.isLoading && notifier.scans.isEmpty
+                      ? const Center(child: CircularProgressIndicator())
+                      : notifier.scans.isEmpty
+                          ? _buildEmptyState(textColor)
+                          : ListView.builder(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              itemCount: notifier.scans.length,
+                              itemBuilder: (context, index) {
+                                final scan = notifier.scans[index];
+                                return _buildHistoryCard(context, scan, textColor, isLight);
+                              },
+                            ),
                 ),
               ),
-            ),
-            backgroundColor: isLight ? AppColors.sand : bgColor,
-            elevation: 0,
-          ),
-          body: RefreshIndicator(
-            onRefresh: () => notifier.refreshHistory(context),
-            color: accentColor,
-            child: notifier.isLoading && notifier.scans.isEmpty
-                ? const Center(child: CircularProgressIndicator())
-                : notifier.scans.isEmpty
-                    ? _buildEmptyState(textColor)
-                    : ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        itemCount: notifier.scans.length,
-                        itemBuilder: (context, index) {
-                          final scan = notifier.scans[index];
-                          return _buildHistoryCard(context, scan, textColor, isLight);
-                        },
-                      ),
+            ],
           ),
         );
       },
@@ -176,6 +164,31 @@ class HistoryPage extends StatelessWidget {
               color: isLight ? AppColors.deepVoid.withOpacity(0.3) : textColor.withOpacity(0.3),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(bool isLight, Color textColor, Color accentColor) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.only(top: 24, bottom: 24),
+      decoration: BoxDecoration(
+        color: isLight ? AppColors.blush : AppColors.elevated,
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(32),
+          bottomRight: Radius.circular(32),
+        ),
+      ),
+      child: Center(
+        child: Text(
+          'Diagnostic History',
+          style: TextStyle(
+            fontFamily: 'Raleway',
+            fontSize: 26,
+            fontWeight: FontWeight.w600,
+            color: isLight ? AppColors.deepVoid : textColor,
+          ),
         ),
       ),
     );

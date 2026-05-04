@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../services/profile_service.dart';
 import '../services/scan_service.dart';
 import '../pages/welcome_page.dart';
+import '../services/pdf_service.dart';
 
 class ProfileNotifier extends ChangeNotifier {
   final ProfileService _profileService = ProfileService();
@@ -114,6 +115,19 @@ class ProfileNotifier extends ChangeNotifier {
             SnackBar(content: Text('Error deleting account: $e')),
           );
         }
+      }
+    }
+  }
+
+  Future<void> exportReport(BuildContext context) async {
+    try {
+      final pdfService = PdfService();
+      await pdfService.exportScanHistory();
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error exporting report: $e')),
+        );
       }
     }
   }
