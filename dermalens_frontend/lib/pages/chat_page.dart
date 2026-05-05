@@ -3,10 +3,24 @@ import 'package:provider/provider.dart';
 import '../notifiers/chat_notifier.dart';
 import '../theme/app_colors.dart';
 
-class ChatPage extends StatelessWidget {
+class ChatPage extends StatefulWidget {
   final String condition;
 
   const ChatPage({super.key, required this.condition});
+
+  @override
+  State<ChatPage> createState() => _ChatPageState();
+}
+
+class _ChatPageState extends State<ChatPage> {
+  @override
+  void initState() {
+    super.initState();
+    // Initialize chat session once when the page opens
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<ChatNotifier>(context, listen: false).initChat(widget.condition);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,9 +33,6 @@ class ChatPage extends StatelessWidget {
 
     return Consumer<ChatNotifier>(
       builder: (context, notifier, child) {
-        // Initialize if empty
-        notifier.initChat(condition);
-
         return Scaffold(
           backgroundColor: bgColor,
           appBar: AppBar(
@@ -38,7 +49,7 @@ class ChatPage extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  condition,
+                  widget.condition,
                   style: TextStyle(
                     fontFamily: 'Raleway',
                     fontSize: 12,
@@ -67,7 +78,7 @@ class ChatPage extends StatelessWidget {
                   },
                 ),
               ),
-              _buildInputArea(context, notifier, cardColor, accentColor, textColor),
+              _buildInputArea(context, notifier, cardColor, accentColor, textColor, widget.condition),
             ],
           ),
         );
@@ -134,7 +145,7 @@ class ChatPage extends StatelessWidget {
     );
   }
 
-  Widget _buildInputArea(BuildContext context, ChatNotifier notifier, Color cardColor, Color accentColor, Color textColor) {
+  Widget _buildInputArea(BuildContext context, ChatNotifier notifier, Color cardColor, Color accentColor, Color textColor, String currentCondition) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -165,13 +176,13 @@ class ChatPage extends StatelessWidget {
                   filled: true,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 ),
-                onSubmitted: (_) => notifier.sendMessage(context, condition),
+                onSubmitted: (_) => notifier.sendMessage(context, currentCondition),
               ),
             ),
             const SizedBox(width: 8),
             IconButton(
               icon: Icon(Icons.send_rounded, color: accentColor),
-              onPressed: () => notifier.sendMessage(context, condition),
+              onPressed: () => notifier.sendMessage(context, currentCondition),
             ),
           ],
         ),

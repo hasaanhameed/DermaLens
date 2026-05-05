@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'auth_notifier.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/profile_service.dart';
 import '../services/scan_service.dart';
@@ -24,7 +26,14 @@ class ProfileNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  // New method to refresh data (used when navigating to Profile page)
+  Future<void> refreshProfile(BuildContext context) async {
+    await loadProfile(context);
+  }
+
   Future<void> loadProfile(BuildContext context) async {
+    isLoading = true;
+    notifyListeners();
     try {
       final results = await Future.wait([
         _profileService.getUserProfile(),
@@ -94,7 +103,17 @@ class ProfileNotifier extends ChangeNotifier {
   Future<void> signOut(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
+    
+    // Clear AuthNotifier fields to ensure a fresh login experience
     if (context.mounted) {
+      final authNotifier = Provider.of<AuthNotifier>(context, listen: false);
+      authNotifier.loginEmailController.clear();
+      authNotifier.loginPasswordController.clear();
+      authNotifier.signupNameController.clear();
+      authNotifier.signupEmailController.clear();
+      authNotifier.signupPasswordController.clear();
+      authNotifier.signupConfirmPasswordController.clear();
+
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const WelcomePage()),

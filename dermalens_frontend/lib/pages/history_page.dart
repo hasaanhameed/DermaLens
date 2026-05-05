@@ -166,10 +166,6 @@ class HistoryPage extends StatelessWidget {
       padding: const EdgeInsets.only(top: 24, bottom: 24),
       decoration: BoxDecoration(
         color: isLight ? AppColors.blush : AppColors.surface,
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(32),
-          bottomRight: Radius.circular(32),
-        ),
       ),
       child: Center(
         child: Text(

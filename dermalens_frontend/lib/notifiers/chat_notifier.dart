@@ -10,12 +10,12 @@ class ChatNotifier extends ChangeNotifier {
   bool isLoading = false;
 
   void initChat(String condition) {
-    if (messages.isEmpty) {
-      messages.add({
-        'role': 'assistant',
-        'content': 'Hello! I am your DermaLens assistant. I can help you understand more about $condition. What would you like to know?'
-      });
-    }
+    messages.clear();
+    messages.add({
+      'role': 'assistant',
+      'content': 'Hello! I am your DermaLens assistant. I can help you understand more about $condition. What would you like to know?'
+    });
+    notifyListeners();
   }
 
   Future<void> sendMessage(BuildContext context, String condition) async {

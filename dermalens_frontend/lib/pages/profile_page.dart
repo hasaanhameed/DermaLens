@@ -6,20 +6,29 @@ import '../notifiers/theme_notifier.dart';
 import 'edit_profile_page.dart';
 import 'terms_page.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  @override
+  void initState() {
+    super.initState();
+    // Load profile once when the page is first initialized in the widget tree
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        Provider.of<ProfileNotifier>(context, listen: false).loadProfile(context);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<ProfileNotifier>(
       builder: (context, notifier, child) {
-        // Initial load logic
-        if (notifier.userData == null && !notifier.isLoading) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            notifier.loadProfile(context);
-          });
-        }
-
         final theme = Theme.of(context);
         final bgColor = theme.scaffoldBackgroundColor;
         final cardColor = theme.cardColor;
@@ -75,10 +84,6 @@ class ProfilePage extends StatelessWidget {
       padding: const EdgeInsets.only(top: 60, bottom: 40, left: 24, right: 24),
       decoration: BoxDecoration(
         color: accentColor.withOpacity(0.1),
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(40),
-          bottomRight: Radius.circular(40),
-        ),
       ),
       child: Column(
         children: [
