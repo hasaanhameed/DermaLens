@@ -3,6 +3,9 @@ services:
     build:
       context: ./dermalens_backend
       dockerfile: Dockerfile
+      cache_from:
+        - ghcr.io/hasaanhameed/dermalens-backend:latest
+    image: ghcr.io/hasaanhameed/dermalens-backend:latest
     container_name: dermalens_backend
     ports:
       - "8000:8000"
